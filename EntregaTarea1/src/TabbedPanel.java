@@ -20,7 +20,6 @@ import org.antlr.v4.gui.TreeViewer;
 import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 
-
 class TabbedPanel extends JFrame
 {
     private JTextArea areaGrammar = new JTextArea(20,120);
