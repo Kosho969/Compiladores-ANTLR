@@ -1,0 +1,8 @@
+class Program x {
+    struct testStruct {
+        int edad;
+        char nombre;
+    }
+
+    struct testStruct algoMas;
+}

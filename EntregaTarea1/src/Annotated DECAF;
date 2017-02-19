@@ -17,7 +17,7 @@ SCAN   :                'scan';
 PRINT  :                'print';
 PROGRAM:                'Program';
 
-// TOKEN
+// TOKENS
 fragment LETTER:    ('a'..'z' | 'A'..'Z');
 WS             :    [ \t\r\n]+ ->   channel(HIDDEN);//Whitespace declaration    
 fragment DIGIT :    ('0'..'9');
@@ -54,9 +54,9 @@ NOTEQ          :    '!=';
 // PRODUCTIONS
 
 /**
- * Semantic action: crear tabla de simbolos para ambito
- * Semantic rule: El programa contiene una definición de un método main sinparámetros, en donde se empezará la ejecución del programa
- * Semantic rule: Ningún identificador es declarado dos veces en el mismo ámbito
+ * Semantic action [PRE]: crear tabla de simbolos para ambito
+ *
+ * Semantic rule [POST]: El programa debe contener una definición de un método main sin parámetros, en donde se empezará la ejecución del programa
  */
 program             : CLASS PROGRAM ID LBRACE (declaration)* RBRACE;
 
@@ -65,23 +65,31 @@ declaration         : structDeclaration
                         | methodDeclaration;
 
 /**
- * Semantic rule: Ningún identificador es declarado dos veces en el mismo ámbito
- * Semantic rule: NUM debe ser mayor a 0 
+ * [POST] Semantic rule: Ningún identificador de tipo 'variable' es declarado dos veces en el mismo ámbito
  */
-varDeclaration      : varType ID DOTCOMMA
-                        | varType ID LCORCH NUM RCORCH DOTCOMMA ;
+varDeclaration      : varType ID DOTCOMMA               # alksdj
+                        | varType ID LCORCH NUM RCORCH DOTCOMMA ; /* [POST] Semantic rule: NUM debe ser mayor a 0 */
 
 /**
- * Semantic action: crear tabla de simbolos para ambito
- * Semantic rule: Ningún identificador es declarado dos veces en el mismo ámbito
+ * [PRE] Semantic action: crear tabla de simbolos para ambito
+ *
+ * [POST] Semantic action: regresar tabla de símbolos
+ * [POST] Semantic rule: Ningún identificador de tipo 'structure' es declarado dos veces en el mismo ámbito
  */
 structDeclaration   : STRUCT ID LBRACE (varDeclaration)* RBRACE;
 
 varType             : (INT | CHAR | BOOLEAN | (STRUCT ID) | structDeclaration | VOID);
 
 /**
- * Semantic action: crear tabla de simbolos para ambito
-
+ * [PRE] Semantic action: crear tabla de simbolos para ambito
+ *
+ *
+ * TODO: 
+ * [MID] Antes de descender a block, instanciar simbolo
+ *
+ * [POST] Semantic action: regresar tabla de símbolos
+ * [POST] Registrar en la tabla de simbolos actual el método actual
+ * [POST] Semantic rule: Ningún identificador de tipo 'method' es declarado dos veces en el mismo ámbito
  */
 methodDeclaration   : methodType ID LPARENT (parameter(COMA parameter)*)? RPARENT block;
 
@@ -91,20 +99,20 @@ methodType          : INT
                      | VOID;
 
 /**
- * Semantic rule: Ningún identificador es declarado dos veces en el mismo ámbito
+ * [POST] Semantic rule: Ningún identificador de tipo 'variable' es declarado dos veces en el mismo ámbito
  */
 parameter           : parameterType ID 
                      | parameterType ID LCORCH RCORCH;
-parameterType       : INT 
-                     | CHAR 
+parameterType       : INT
+                     | CHAR
                      | BOOLEAN ;
 block               : LBRACE (varDeclaration)* (statement)* RBRACE ;
-statement           : myIf 
-                     | returnBlock 
-                     | whileBlock 
-                     | methodCall DOTCOMMA 
-                     | assignation 
-                     | expression DOTCOMMA 
+statement           : myIf
+                     | returnBlock
+                     | whileBlock
+                     | methodCall DOTCOMMA
+                     | assignation
+                     | expression DOTCOMMA
                      | print;
 
 /**
@@ -118,9 +126,11 @@ assignation         : location EQ (expression ) DOTCOMMA ;
 whileBlock          :  WHILE LPARENT expression RPARENT block ;
 
 /**
- * Semantic rule: Si el tipo de metodo es void no debe llevar valor de retorno
- * Semantic rule: El tipo de retorno tiene que ser el mmismo que el tipo de metodo 
- */ 
+ * TODO: Determinar si puedo hacer llegar el symbol del método a este punto
+ *
+ * [POST] Semantic rule: Si el tipo de metodo es void no debe llevar valor de retorno
+ * [POST] Semantic rule: El tipo de retorno tiene que ser el mmismo que el tipo de metodo
+ */
 returnBlock         : RETURN (nExpression) DOTCOMMA ;
 
 
@@ -137,14 +147,14 @@ declaredVariable    : variable
                      | arrayVariable;
 
 /**
- * Semantic rule: Ningun identificador es utilizado antes de ser declarado 
+ * [POST] Semantic rule: Ningun identificador de tipo 'variable' es utilizado antes de ser declarado
+ *
  * Semantic rule: si se tiene un arrayVariable, id debe ser un arreglo y el tipo debe der int. 
  */
 variable            : ID;
 arrayVariable       : ID LCORCH expression RCORCH ;
+
 expressionInP       : LPARENT expression RPARENT ;
-
-
 nExpression         : expression | ;
 
 /**
@@ -188,18 +198,17 @@ basicExpression     : LPARENT (INT|CHAR) RPARENT basic
                     | EXC basic 
                     | basic;
 
-/**
- * Semantic rule: methodCall tiene que devolver algo. 
- */
 basic               : expressionInP 
                     | location 
-                    | methodCall 
+                    | methodCall /* [POST] Semantic rule: methodCall tiene que devolver algo, su type no puede ser 'void' */
                     | literal;
+
 arg                 : expression;
 
 /**
- * Semantic rule: La cantidad y el tipo de argumentos deben de ser los mismos que los ya declarados.
- * Semantic rule: Ningun identificador es utilizado antes de ser declarado 
+ * [POST] Semantic rule: El número y tipos de argumentos en la llamada a un método deben de ser los mismos que los ya declarados.
+ *
+ * Semantic rule: Ningun identificador de tipo 'method' es utilizado antes de ser declarado 
  */
 methodCall          : ID LPARENT (arg(COMA arg)*)? RPARENT;
 
