@@ -1201,8 +1201,10 @@ public class DECAFParser extends Parser {
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof DECAFVisitor ) return ((DECAFVisitor<? extends T>)visitor).visitReturnBlockProduction(this);
-			else return visitor.visitChildren(this);
+			if ( visitor instanceof DECAFVisitor )
+				return ((DECAFVisitor<? extends T>)visitor).visitReturnBlockProduction(this, "algo");
+			else
+				return visitor.visitChildren(this);
 		}
 	}
 

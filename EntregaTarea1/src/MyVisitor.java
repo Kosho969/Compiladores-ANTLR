@@ -59,8 +59,32 @@ public class MyVisitor extends DECAFBaseVisitor<Integer>
 	@Override
 	// [THIS WORDS]
 	public Integer visitMethodDeclarationProduction(DECAFParser.MethodDeclarationProductionContext ctx) {
-		// TODO Auto-generated method stub
-		return super.visitMethodDeclarationProduction(ctx);
+		// return super.visitMethodDeclarationProduction(ctx);
+		
+		// Visitar methodType
+        visit(ctx.methodType());
+        
+        // Visitar ID
+        visit(ctx.ID());
+
+        // Visitar LPARENT
+        visit(ctx.LPARENT());
+
+        // Visitar (parameter(COMA parameter)*)?
+        // Armar firma del método: listado de VariableSymbol
+        for (DECAFParser.ParameterContext element : ctx.parameter()) {
+        	visit(element);
+        }
+
+        // Visitar RPARENT
+        visit(ctx.RPARENT());
+
+		// Ejecutar cosas locas
+        // Instanciar MethodSymbol
+		System.out.println("Haciendo cosas locasl :-D");
+
+		// Visitar block
+		return visit(ctx.block());
 	}
 
 	@Override
@@ -117,9 +141,13 @@ public class MyVisitor extends DECAFBaseVisitor<Integer>
 
 	@Override
 	// [THIS WORDS]
-	public Integer visitReturnBlockProduction(DECAFParser.ReturnBlockProductionContext ctx) {
-		// TODO Auto-generated method stub
-		return super.visitReturnBlockProduction(ctx);
+	public Integer visitReturnBlockProduction(DECAFParser.ReturnBlockProductionContext ctx, String test) {
+		System.out.println("Visitando return con: " + test);
+		
+		// TODO: Comparar el resultado de super.visitReturnBlockProduction(ctx, test);
+		// contra methodSymbol.type.
+
+		return super.visitReturnBlockProduction(ctx, test);
 	}
 
 	@Override

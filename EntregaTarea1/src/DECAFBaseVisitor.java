@@ -58,7 +58,10 @@ public class DECAFBaseVisitor<T> extends AbstractParseTreeVisitor<T> implements 
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitMethodDeclarationProduction(DECAFParser.MethodDeclarationProductionContext ctx) { return visitChildren(ctx); }
+	@Override public T visitMethodDeclarationProduction(DECAFParser.MethodDeclarationProductionContext ctx) {
+		return visitChildren(ctx);
+	}
+
 	/**
 	 * {@inheritDoc}
 	 *
@@ -121,7 +124,7 @@ public class DECAFBaseVisitor<T> extends AbstractParseTreeVisitor<T> implements 
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitReturnBlockProduction(DECAFParser.ReturnBlockProductionContext ctx) { return visitChildren(ctx); }
+	@Override public T visitReturnBlockProduction(DECAFParser.ReturnBlockProductionContext ctx, String test) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *

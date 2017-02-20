@@ -113,7 +113,7 @@ public interface DECAFVisitor<T> extends ParseTreeVisitor<T> {
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitReturnBlockProduction(DECAFParser.ReturnBlockProductionContext ctx);
+	T visitReturnBlockProduction(DECAFParser.ReturnBlockProductionContext ctx, String test);
 	/**
 	 * Visit a parse tree produced by {@link DECAFParser#print}.
 	 * @param ctx the parse tree

@@ -83,8 +83,6 @@ varType             : (INT | CHAR | BOOLEAN | (STRUCT ID) | structDeclaration | 
 /**
  * [PRE] Semantic action: crear tabla de simbolos para ambito
  *
- *
- * TODO: 
  * [MID] Antes de descender a block, instanciar simbolo
  *
  * [POST] Semantic action: regresar tabla de símbolos
