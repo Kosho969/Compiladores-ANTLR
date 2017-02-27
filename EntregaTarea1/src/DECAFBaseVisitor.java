@@ -29,8 +29,9 @@ public class DECAFBaseVisitor<T> extends AbstractParseTreeVisitor<T> implements 
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
+	 * @throws SemanticErrorException 
 	 */
-	@Override public T visitRegularVariableProduction(DECAFParser.RegularVariableProductionContext ctx) { return visitChildren(ctx); }
+	@Override public T visitRegularVariableProduction(DECAFParser.RegularVariableProductionContext ctx) throws SemanticErrorException { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *

@@ -7,9 +7,12 @@ import org.antlr.v4.runtime.misc.ParseCancellationException;
 
 public class ThrowingErrorListener extends BaseErrorListener
 {
-   //public static final ThrowingErrorListener INSTANCE = new ThrowingErrorListener();
-    private static String newline = System.getProperty("line.separator");
+	// public static final ThrowingErrorListener INSTANCE = new ThrowingErrorListener();
+
+	private static String newline = System.getProperty("line.separator");
+
     private String errorMsg = "Syntax errors:";
+
     Path file = Paths.get("ErrorLog_Syntax.log");
 
     /**
@@ -19,6 +22,7 @@ public class ThrowingErrorListener extends BaseErrorListener
     public ThrowingErrorListener()
     {
         String errorMsg = "Errores Sintacticos: ";
+
         file = Paths.get("ErrorLog_Syntax.log");
     }
 

@@ -1,0 +1,7 @@
+class Program x {
+    int a;
+
+    struct Juanito {
+        int a;
+    }
+}

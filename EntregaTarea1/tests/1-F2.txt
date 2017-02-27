@@ -1,0 +1,9 @@
+class Program x {
+    int a;
+
+    void factorial ()
+    {
+        boolean b1;
+        boolean b1;
+    }
+}

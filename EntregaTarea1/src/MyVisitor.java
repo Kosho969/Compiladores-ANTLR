@@ -5,21 +5,18 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-public class MyVisitor extends DECAFBaseVisitor<Integer>
+public class MyVisitor extends DECAFBaseVisitor<Integer> 
 {
 	// We will need here the current environment
-	
+	Environment currentEnvironment;
+
 	// ADD [THIS WORDS] to the ones I think I'm going to use
+
 	@Override
-	// [THIS WORDS]
 	public Integer visitProgramProduction(DECAFParser.ProgramProductionContext ctx) {
 		String id = ctx.ID().getText();
 
-		System.out.println(
-			"ID: "
-				+ id
-				+ " .Semantic action: crear tabla de simbolos para ambito"
-		);
+		currentEnvironment = new Environment(null);
 
 		return super.visitProgramProduction(ctx);
 	}
@@ -31,10 +28,44 @@ public class MyVisitor extends DECAFBaseVisitor<Integer>
 	}
 
 	@Override
-	// [THIS WORDS]
-	public Integer visitRegularVariableProduction(DECAFParser.RegularVariableProductionContext ctx) {
-		// TODO Auto-generated method stub
-		return super.visitRegularVariableProduction(ctx);
+	public Integer visitRegularVariableProduction(DECAFParser.RegularVariableProductionContext ctx) throws SemanticErrorException {
+		Integer retorno = super.visitRegularVariableProduction(ctx);
+		
+		boolean symbolAlreadyExists = false; 
+		
+		String symbolType = ctx.varType().getText();
+		
+		String identifier = ctx.ID().getText();
+		
+		
+		VariableSymbol currentSymbol = new VariableSymbol(symbolType,identifier,false,false);
+		TableEntry entry = new TableEntry(symbolType, identifier, currentSymbol);
+		for (int i = 0; i< currentEnvironment.getSymbolTable().size(); i++){
+			String typeInTable = currentEnvironment.getSymbolTable().get(i).getType();
+			String nameInTable = currentEnvironment.getSymbolTable().get(i).getLexem();
+			if(typeInTable.equals(symbolType) && nameInTable.equals(identifier)){
+				symbolAlreadyExists = true;
+			}
+			
+		}
+		if(!symbolAlreadyExists)
+			throw new SemanticErrorException("No se permite eso que está intentando hacer");
+		// TODO: Paso número tres, agregar validación para determinar si variable existe
+		
+		
+		// TODO: Paso número uno, implementar excepciones
+		
+		//ctx.getStart().getLine()
+		//ctx.getStart().getCharPositionInLine()
+		
+		// TODO: Paso número dos, obtener valores, e insertar en tábla de símbolos
+		
+
+		// VariableSymbol symbol = new VariableSymbol()
+		
+		
+		
+		return retorno;
 	}
 
 	@Override
@@ -218,6 +249,7 @@ public class MyVisitor extends DECAFBaseVisitor<Integer>
 	// [THIS WORDS]
 	public Integer visitAndExpr(DECAFParser.AndExprContext ctx) {
 		// TODO Auto-generated method stub
+		ctx.andExpression();
 		return super.visitAndExpr(ctx);
 	}
 
@@ -225,6 +257,7 @@ public class MyVisitor extends DECAFBaseVisitor<Integer>
 	// [THIS WORDS]
 	public Integer visitEqualsExpr(DECAFParser.EqualsExprContext ctx) {
 		// TODO Auto-generated method stub
+		ctx.equalsExpression();
 		return super.visitEqualsExpr(ctx);
 	}
 
@@ -246,6 +279,7 @@ public class MyVisitor extends DECAFBaseVisitor<Integer>
 	// [THIS WORDS]
 	public Integer visitRelationExpr(DECAFParser.RelationExprContext ctx) {
 		// TODO Auto-generated method stub
+		ctx.relationExpression();
 		return super.visitRelationExpr(ctx);
 	}
 
@@ -253,6 +287,7 @@ public class MyVisitor extends DECAFBaseVisitor<Integer>
 	// [THIS WORDS]
 	public Integer visitAddSubsExpr(DECAFParser.AddSubsExprContext ctx) {
 		// TODO Auto-generated method stub
+		ctx.addSubsExpression();
 		return super.visitAddSubsExpr(ctx);
 	}
 
@@ -260,6 +295,9 @@ public class MyVisitor extends DECAFBaseVisitor<Integer>
 	// [THIS WORDS]
 	public Integer visitRelationProduction(DECAFParser.RelationProductionContext ctx) {
 		// TODO Auto-generated method stub
+		ctx.relationExpression();
+		ctx.rel_op().getText();
+		ctx.addSubsExpression();
 		return super.visitRelationProduction(ctx);
 	}
 
@@ -274,6 +312,7 @@ public class MyVisitor extends DECAFBaseVisitor<Integer>
 	// [THIS WORDS]
 	public Integer visitMulDivExpr(DECAFParser.MulDivExprContext ctx) {
 		// TODO Auto-generated method stub
+		ctx.mulDivExpression();
 		return super.visitMulDivExpr(ctx);
 	}
 
@@ -281,6 +320,7 @@ public class MyVisitor extends DECAFBaseVisitor<Integer>
 	// [THIS WORDS]
 	public Integer visitPrExpr(DECAFParser.PrExprContext ctx) {
 		// TODO Auto-generated method stub
+		ctx.prExpression();
 		return super.visitPrExpr(ctx);
 	}
 
@@ -294,18 +334,21 @@ public class MyVisitor extends DECAFBaseVisitor<Integer>
 	@Override
 	public Integer visitPrExpression(DECAFParser.PrExpressionContext ctx) {
 		// TODO Auto-generated method stub
+		ctx.basicExpression();
 		return super.visitPrExpression(ctx);
 	}
 
 	@Override
 	public Integer visitBasicExpression(DECAFParser.BasicExpressionContext ctx) {
 		// TODO Auto-generated method stub
+		ctx.basic();
 		return super.visitBasicExpression(ctx);
 	}
 
 	@Override
 	public Integer visitBasic(DECAFParser.BasicContext ctx) {
 		// TODO Auto-generated method stub
+		ctx.literal();
 		return super.visitBasic(ctx);
 	}
 
@@ -360,12 +403,15 @@ public class MyVisitor extends DECAFBaseVisitor<Integer>
 	@Override
 	public Integer visitLiteral(DECAFParser.LiteralContext ctx) {
 		// TODO Auto-generated method stub
+		ctx.int_literal();
 		return super.visitLiteral(ctx);
 	}
 
 	@Override
 	public Integer visitInt_literal(DECAFParser.Int_literalContext ctx) {
 		// TODO Auto-generated method stub
+		ctx.getText();
+		System.out.println("Es integer "+ctx.getText());
 		return super.visitInt_literal(ctx);
 	}
 

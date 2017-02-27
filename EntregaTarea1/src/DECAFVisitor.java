@@ -27,8 +27,9 @@ public interface DECAFVisitor<T> extends ParseTreeVisitor<T> {
 	 * labeled alternative in {@link DECAFParser#varDeclaration}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
+	 * @throws SemanticErrorException 
 	 */
-	T visitRegularVariableProduction(DECAFParser.RegularVariableProductionContext ctx);
+	T visitRegularVariableProduction(DECAFParser.RegularVariableProductionContext ctx) throws SemanticErrorException;
 	/**
 	 * Visit a parse tree produced by the {@code arrayVariableProduction}
 	 * labeled alternative in {@link DECAFParser#varDeclaration}.

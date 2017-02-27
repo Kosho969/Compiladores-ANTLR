@@ -23,7 +23,7 @@ import org.antlr.v4.runtime.CommonTokenStream;
 class TabbedPanel extends JFrame
 {
     private JTextArea areaGrammar = new JTextArea(20,120);
-    private JTextArea areaTest = new JTextArea(20,120);
+    public JTextArea areaTest = new JTextArea(20,120);
     private JTextArea areaError = new JTextArea(20,120);
     private JFileChooser dialog = new JFileChooser(System.getProperty("user.dir"));
     private String currentFile = "Untitled";
@@ -94,7 +94,7 @@ class TabbedPanel extends JFrame
         tabbedPane.addTab("Errors", scrollError);
     }
 
-    private void readToTree()
+    public Integer readToTree()
     {
         //ANTLR Tree
         ANTLRInputStream input = new ANTLRInputStream(areaTest.getText());
@@ -116,8 +116,15 @@ class TabbedPanel extends JFrame
         parser.addErrorListener(miErrorListener);
 
         ParseTree tree = parser.program();
-        MyVisitor visitor = new MyVisitor();
-        visitor.visit(tree);
+
+        // Procesar validaciones semánticas
+        try {
+        	MyVisitor visitor = new MyVisitor();
+            visitor.visit(tree);
+        } catch (SemanticErrorException e) {
+        	// Escribir el error con su info al archivo file
+        	 Files.write(file, Arrays.asList(e.getMessage()), Charset.forName("UTF-8"));
+        }
 
         TreeViewer viewr = new TreeViewer(
             Arrays.asList(parser.getRuleNames()),
@@ -143,8 +150,12 @@ class TabbedPanel extends JFrame
             for (int i = 0; i < errors.size(); i++) {
                 areaError.append("(" + (i + 1) + "): " + errors.get(i) + "\n");
             }
+            
+            return 1;
         } catch ( IOException e ) {
             areaError.setText(" NO ERRORS ");
+            
+            return 0;
         }
     }
 }

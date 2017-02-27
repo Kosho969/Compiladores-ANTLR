@@ -54,7 +54,7 @@ NOTEQ          :    '!=';
 // PRODUCTIONS
 
 /**
- * Semantic action [PRE]: crear tabla de simbolos para ambito
+ * [D] [PRE] Semantic action: crear tabla de simbolos para ámbito
  *
  * Semantic rule [POST]: El programa debe contener una definición de un método main sin parámetros, en donde se empezará la ejecución del programa
  */
@@ -66,6 +66,7 @@ declaration         : structDeclaration
 
 /**
  * [POST] Semantic rule: Ningún identificador de tipo 'variable' es declarado dos veces en el mismo ámbito
+ *
  */
 varDeclaration      : varType ID DOTCOMMA               # alksdj
                         | varType ID LCORCH NUM RCORCH DOTCOMMA ; /* [POST] Semantic rule: NUM debe ser mayor a 0 */
@@ -120,6 +121,7 @@ assignation         : location EQ (expression ) DOTCOMMA ;
 
 /**
  * Semantic rule: El tipo de if y while debe de ser boolean 
+ * ¿Hay que validar en expression esto y retornarlo?
  */
 whileBlock          :  WHILE LPARENT expression RPARENT block ;
 
@@ -136,6 +138,7 @@ print               : PRINT LPARENT ( STRING | location ) RPARENT DOTCOMMA;
 
 /**
  * Semantic rule: El tipo de if y while debe de ser boolean 
+ * ¿Hay que validar en expression esto y retornarlo?
  */
 myIf                : IF LPARENT expression RPARENT block(ELSE block)?;
 location            : declaredVariable | dotLocation;
@@ -147,7 +150,7 @@ declaredVariable    : variable
 /**
  * [POST] Semantic rule: Ningun identificador de tipo 'variable' es utilizado antes de ser declarado
  *
- * Semantic rule: si se tiene un arrayVariable, id debe ser un arreglo y el tipo debe der int. 
+ * [POST] {Es cuestion de visitar esa produccion y validar, caso parecido al return block} Semantic rule: si se tiene un arrayVariable, id debe ser un arreglo y el tipo debe der int. PUEDE QUE HAYA UN [MID] 
  */
 variable            : ID;
 arrayVariable       : ID LCORCH expression RCORCH ;
@@ -156,36 +159,45 @@ expressionInP       : LPARENT expression RPARENT ;
 nExpression         : expression | ;
 
 /**
- * Semantic rule: Los tipos de los operandos debe de ser boolean
+ * PUEDE QUE HAYA UN [MID]
+ *
+ * De nuevo ir a cada producción de expression para poder obtener los tipos.
+ *
+ * [POST] Debe devolver un objeto Symbol
  */
-expression          : andExpression 
-                    | expression OR andExpression;
+expression          : andExpression
+                    | expression OR andExpression; /* [POST] Semantic rule: Los tipos de los operandos debe de ser boolean */
 
 /**
- * Semantic rule: Los tipos de los operandos debe de ser boolean
+ * [POST]Semantic rule: Los tipos de los operandos debe de ser boolean
+ PUEDE QUE HAYA UN [MID] 
  */
 andExpression       : equalsExpression 
                     | andExpression AND equalsExpression;
 
 /**
- * Semantic rule: Los tipos de los operandos debe de ser int, char o boolean y deben de ser del mismo tipo 
+ * [POST]Semantic rule: Los tipos de los operandos debe de ser int, char o boolean y deben de ser del mismo tipo 
+ PUEDE QUE HAYA UN [MID] 
  */
 equalsExpression    : relationExpression 
                     | equalsExpression eq_op relationExpression;
 /**
- * Semantic rule: Los tipos de los operandos debe de ser int  
+ * [POST]Semantic rule: Los tipos de los operandos debe de ser int 
+ PUEDE QUE HAYA UN [MID]  
  */
 relationExpression  : addSubsExpression 
                     | relationExpression rel_op addSubsExpression;
 
 /**
- * Semantic rule: Los tipos de los operandos debe de ser int  
+ * [POST]Semantic rule: Los tipos de los operandos debe de ser int
+ PUEDE QUE HAYA UN [MID]  
  */
 addSubsExpression   : mulDivExpression 
                     | addSubsExpression arith_op mulDivExpression;
 
 /**
- * Semantic rule: Los tipos de los operandos debe de ser int  
+ * [POST]Semantic rule: Los tipos de los operandos debe de ser int  
+ PUEDE QUE HAYA UN [MID] 
  */
 mulDivExpression    : prExpression 
                     | mulDivExpression md_op prExpression;
@@ -198,7 +210,7 @@ basicExpression     : LPARENT (INT|CHAR) RPARENT basic
 
 basic               : expressionInP 
                     | location 
-                    | methodCall /* [POST] Semantic rule: methodCall tiene que devolver algo, su type no puede ser 'void' */
+                    | methodCall /* [POST] Semantic rule: methodCall tiene que devolver algo, su type no puede ser 'void' y de serlo que no haya return o sea tipo void */
                     | literal;
 
 arg                 : expression;
@@ -206,7 +218,7 @@ arg                 : expression;
 /**
  * [POST] Semantic rule: El número y tipos de argumentos en la llamada a un método deben de ser los mismos que los ya declarados.
  *
- * Semantic rule: Ningun identificador de tipo 'method' es utilizado antes de ser declarado 
+ * [POST] Semantic rule: Ningun identificador de tipo 'method' es utilizado antes de ser declarado 
  */
 methodCall          : ID LPARENT (arg(COMA arg)*)? RPARENT;
 
@@ -218,10 +230,22 @@ rel_op              : LTHAN | MTHAN | EQLTHAN | EQMTHAN ;
 eq_op               : EQEQ | NOTEQ;
 cond_op             : AND | OR;
 
+/**
+ * [POST]: Semantic actions devolver una instancia de Symbol
+ */
 literal             : int_literal | char_literal | bool_literal;
 
+/**
+ * [POST]: Semantic actions devolver una instancia de Symbol
+ */
 int_literal         : NUM;
 
+/**
+ * [POST]: Semantic actions devolver una instancia de Symbol
+ */
 char_literal        : CHR;
 
+/**
+ * [POST]: Semantic actions devolver una instancia de Symbol
+ */
 bool_literal        : TRUE | FALSE;
