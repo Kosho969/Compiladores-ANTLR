@@ -12,7 +12,7 @@ public class antlrIDE {
 	
 		// TODO: Remove this stuff
 		try {
-			panel.areaTest.setText(antlrIDE.readFile("tests/1-F1.txt"));
+			panel.areaTest.setText(antlrIDE.readFile("tests/1-S2.txt"));
 
 			// If success, exit
 			if (0 == panel.readToTree()) {

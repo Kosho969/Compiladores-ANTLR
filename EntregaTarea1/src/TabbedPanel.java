@@ -117,14 +117,8 @@ class TabbedPanel extends JFrame
 
         ParseTree tree = parser.program();
 
-        // Procesar validaciones semánticas
-        try {
-        	MyVisitor visitor = new MyVisitor();
-            visitor.visit(tree);
-        } catch (SemanticErrorException e) {
-        	// Escribir el error con su info al archivo file
-        	 Files.write(file, Arrays.asList(e.getMessage()), Charset.forName("UTF-8"));
-        }
+        MyVisitor visitor = new MyVisitor();
+		visitor.visit(tree);
 
         TreeViewer viewr = new TreeViewer(
             Arrays.asList(parser.getRuleNames()),

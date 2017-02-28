@@ -1,5 +1,5 @@
 class Program x {
-    int a
-
+    int a;
+    int a;
     int a;
 }

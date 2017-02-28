@@ -29,7 +29,7 @@ public interface DECAFVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 * @throws SemanticErrorException 
 	 */
-	T visitRegularVariableProduction(DECAFParser.RegularVariableProductionContext ctx) throws SemanticErrorException;
+	T visitRegularVariableProduction(DECAFParser.RegularVariableProductionContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code arrayVariableProduction}
 	 * labeled alternative in {@link DECAFParser#varDeclaration}.

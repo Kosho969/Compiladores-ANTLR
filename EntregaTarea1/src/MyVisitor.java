@@ -28,30 +28,39 @@ public class MyVisitor extends DECAFBaseVisitor<Integer>
 	}
 
 	@Override
-	public Integer visitRegularVariableProduction(DECAFParser.RegularVariableProductionContext ctx) throws SemanticErrorException {
+	public Integer visitRegularVariableProduction(DECAFParser.RegularVariableProductionContext ctx){
 		Integer retorno = super.visitRegularVariableProduction(ctx);
 		
 		boolean symbolAlreadyExists = false; 
 		
 		String symbolType = ctx.varType().getText();
+		//System.out.print("Type: "+symbolType+"\n");
 		
 		String identifier = ctx.ID().getText();
-		
+		//System.out.print("ID: "+identifier+"\n");
 		
 		VariableSymbol currentSymbol = new VariableSymbol(symbolType,identifier,false,false);
 		TableEntry entry = new TableEntry(symbolType, identifier, currentSymbol);
+		//System.out.println("Entrando al for");
 		for (int i = 0; i< currentEnvironment.getSymbolTable().size(); i++){
 			String typeInTable = currentEnvironment.getSymbolTable().get(i).getType();
+			//System.out.print("Type in Table: "+typeInTable+"\n");
 			String nameInTable = currentEnvironment.getSymbolTable().get(i).getLexem();
+			//System.out.print("Name in Table: "+nameInTable+"\n");
 			if(typeInTable.equals(symbolType) && nameInTable.equals(identifier)){
 				symbolAlreadyExists = true;
 			}
 			
 		}
-		if(!symbolAlreadyExists)
-			throw new SemanticErrorException("No se permite eso que está intentando hacer");
+		if(symbolAlreadyExists){
+			System.out.print(symbolType+" "+identifier+"\n");
+			System.out.print("No se permite eso que está intentando hacer \n");
+		}
 		// TODO: Paso número tres, agregar validación para determinar si variable existe
-		
+		else{
+			currentEnvironment.putSymbol(symbolType,identifier, currentSymbol);
+			//System.out.print("Added");
+		}
 		
 		// TODO: Paso número uno, implementar excepciones
 		
@@ -62,7 +71,6 @@ public class MyVisitor extends DECAFBaseVisitor<Integer>
 		
 
 		// VariableSymbol symbol = new VariableSymbol()
-		
 		
 		
 		return retorno;

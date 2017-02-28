@@ -29,8 +29,8 @@ public class Environment {
 		this.symbolTable = symbolTable;
 	}
 	
-	public void putSymbol(String name,String type, Symbol s){
-		symbolTable.add(new TableEntry(name, type, s));
+	public void putSymbol(String type,String lexema, Symbol s){
+		this.symbolTable.add(new TableEntry(type, lexema, s));
 	}
 	
 	public Symbol getSymbol(String name,String type){
