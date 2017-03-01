@@ -4,6 +4,11 @@ class Program x {
     void factorial ()
     {
         boolean b1;
+        b2;
+    }
+     void factorial ()
+    {
         boolean b1;
+        b1;
     }
 }

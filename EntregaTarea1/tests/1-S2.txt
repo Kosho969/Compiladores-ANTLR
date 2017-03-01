@@ -1,7 +1,7 @@
 class Program x {
-    int a;
-
+    int b;
     struct Juanito {
         int a;
+        int b; 
     }
 }
