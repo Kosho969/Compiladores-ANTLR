@@ -48,10 +48,10 @@ public class ThrowingErrorListener extends BaseErrorListener
         writeErrors(errorMsg, file);
     }
 
-    private void writeErrors(String msgs, Path file) {
+    private void writeErrors(String msg, Path file) {
         try {
             //Files.deleteIfExists(file);
-            Files.write(file, Arrays.asList(msgs), Charset.forName("UTF-8"));
+            Files.write(file, Arrays.asList(msg), Charset.forName("UTF-8"));
         } catch (IOException e) {
             System.err.println("Something is wrong.");
         }

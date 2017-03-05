@@ -24,6 +24,8 @@ class TabbedPanel extends JFrame
 {
     private JTextArea areaGrammar = new JTextArea(20,120);
     public JTextArea areaTest = new JTextArea(20,120);
+    public JScrollPane scrollError = null;
+    public JTabbedPane tabbedPane;
     private JTextArea areaError = new JTextArea(20,120);
     private JFileChooser dialog = new JFileChooser(System.getProperty("user.dir"));
     private String currentFile = "Untitled";
@@ -63,7 +65,7 @@ class TabbedPanel extends JFrame
         // Error Viewr
         areaError.setFont(new Font("Monospaced", Font.PLAIN, 12));
         areaError.setEditable(false);
-        JScrollPane scrollError = new JScrollPane(
+        scrollError = new JScrollPane(
             areaError,
             JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
             JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS
@@ -84,7 +86,7 @@ class TabbedPanel extends JFrame
         setTitle(currentFile);
         setVisible(true);
 
-        JTabbedPane tabbedPane = new JTabbedPane();
+        tabbedPane = new JTabbedPane();
         Container contentPane = getContentPane();
 
         contentPane.add(tabbedPane,BorderLayout.CENTER);

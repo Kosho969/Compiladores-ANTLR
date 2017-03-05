@@ -1,15 +1,21 @@
 /*
  * Visitor a implementarse para las reglas semánticas 
  */
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-
+import java.util.Stack;
 
 public class MyVisitor extends DECAFBaseVisitor<String> 
 {
 	// We will need here the current environment
-	Environment currentEnvironment;
-	Environment saved = new Environment(null); 
+	Environment currentEnvironment = null;
+	Stack<Environment> environmentsStack = new Stack<Environment>(); 
 
 	// ADD [THIS WORDS] to the ones I think I'm going to use
 
@@ -17,6 +23,7 @@ public class MyVisitor extends DECAFBaseVisitor<String>
 	public String visitProgramProduction(DECAFParser.ProgramProductionContext ctx) {
 		String id = ctx.ID().getText();
 
+		System.out.println("Creating new current environment");
 		currentEnvironment = new Environment(null);
 
 		return super.visitProgramProduction(ctx);
@@ -43,20 +50,23 @@ public class MyVisitor extends DECAFBaseVisitor<String>
 		VariableSymbol currentSymbol = new VariableSymbol(symbolType,identifier,false,false);
 		TableEntry entry = new TableEntry(symbolType, identifier, currentSymbol);
 		System.out.println("Entrando al for");
+
 		for (int i = 0; i< currentEnvironment.getSymbolTable().size(); i++){
 			String typeInTable = currentEnvironment.getSymbolTable().get(i).getType();
 			System.out.print("Type in Table: "+typeInTable+"\n");
 			String nameInTable = currentEnvironment.getSymbolTable().get(i).getLexem();
 			System.out.print("Name in Table: "+nameInTable+"\n");
-			if(typeInTable.equals(symbolType) && nameInTable.equals(identifier)){
+
+			if (typeInTable.equals(symbolType) && nameInTable.equals(identifier)){
 				symbolAlreadyExists = true;
 			}
 			
 		}
-		if(symbolAlreadyExists){
-			System.out.print(symbolType+" "+identifier+"\n");
-			System.out.print("No se permite eso que está intentando hacer \n");
+
+		if (symbolAlreadyExists) {
+			handleSemanticError("Identificador '" + identifier + "' ya utilizado en entorno actual");
 		}
+
 		// TODO: Paso número tres, agregar validación para determinar si variable existe
 		else{
 			currentEnvironment.putSymbol(symbolType,identifier, currentSymbol);
@@ -84,15 +94,23 @@ public class MyVisitor extends DECAFBaseVisitor<String>
 
 	@Override
 	public String visitStructDeclaration(DECAFParser.StructDeclarationContext ctx) {
+
 		// TODO Auto-generated method stub
 		boolean symbolAlreadyExists = false; 		
-		currentEnvironment = saved;
+		
+		System.out.println("Pushing environment to stack");
+		environmentsStack.push(currentEnvironment);
+
+		System.out.println("Creating new current environment");
+		currentEnvironment = new Environment(currentEnvironment);
+		
 		String identifier = ctx.ID().getText();
 		System.out.print("ID: "+identifier+"\n");
 		
 		Symbol currentSymbol = new Symbol("void",identifier,true);
 		TableEntry entry = new TableEntry("void", identifier, currentSymbol);
 		System.out.println("Entrando al for");
+
 		for (int i = 0; i< currentEnvironment.getSymbolTable().size(); i++){
 			String typeInTable = currentEnvironment.getSymbolTable().get(i).getType();
 			String nameInTable = currentEnvironment.getSymbolTable().get(i).getLexem();
@@ -102,6 +120,7 @@ public class MyVisitor extends DECAFBaseVisitor<String>
 			}
 			
 		}
+
 		if(symbolAlreadyExists){
 			System.out.print(identifier+"\n");
 			System.out.print("No se permite eso que está intentando hacer \n");
@@ -111,9 +130,13 @@ public class MyVisitor extends DECAFBaseVisitor<String>
 			currentEnvironment.putSymbol("void",identifier, currentSymbol);
 			System.out.print("Added \n");
 		}
-		saved = currentEnvironment;
-		currentEnvironment = new Environment(currentEnvironment);
-		return super.visitStructDeclaration(ctx);
+		
+		String result = super.visitStructDeclaration(ctx);
+		
+		System.out.println("Poping environment from stack");
+		currentEnvironment = environmentsStack.pop();
+		
+		return result;
 	}
 
 	@Override
@@ -126,9 +149,15 @@ public class MyVisitor extends DECAFBaseVisitor<String>
 	// [THIS WORDS]
 	public String visitMethodDeclarationProduction(DECAFParser.MethodDeclarationProductionContext ctx) {
 		// return super.visitMethodDeclarationProduction(ctx);
-		
+
+		System.out.println("Pushing environment to stack");
+		environmentsStack.push(currentEnvironment);
+
+		System.out.println("Creating new current environment");
+		currentEnvironment = new Environment(currentEnvironment);
+
 		boolean symbolAlreadyExists = false; 		
-		currentEnvironment = saved;
+
 		String symbolType = ctx.methodType().getText();
 		System.out.print("Type: "+symbolType+"\n");
 		
@@ -156,8 +185,7 @@ public class MyVisitor extends DECAFBaseVisitor<String>
 			currentEnvironment.putSymbol("void",identifier, currentSymbol);
 			System.out.print("Added \n");
 		}
-		saved = currentEnvironment;
-		currentEnvironment = new Environment(currentEnvironment);
+
 		// Visitar methodType
         visit(ctx.methodType());
         
@@ -178,10 +206,14 @@ public class MyVisitor extends DECAFBaseVisitor<String>
 
 		// Ejecutar cosas locas
         // Instanciar MethodSymbol
-		System.out.println("Haciendo cosas locasl :-D");
 
 		// Visitar block
-		return visit(ctx.block());
+		String result = visit(ctx.block());
+		
+		System.out.println("Poping environment from stack");
+		currentEnvironment = environmentsStack.pop();
+		
+		return result;
 	}
 
 	@Override
@@ -503,6 +535,11 @@ public class MyVisitor extends DECAFBaseVisitor<String>
 	@Override
 	public String visitBasicExpression(DECAFParser.BasicExpressionContext ctx) {
 		// TODO Auto-generated method stu
+		//if (ctx.getChildCount()==2){
+		//	if(ctx.getChild(0).equals("-");
+			
+		//	ctx.getChild(1)
+		//}
 		String basic = visitChildren(ctx);
 		return basic;
 	}
@@ -588,5 +625,21 @@ public class MyVisitor extends DECAFBaseVisitor<String>
 	public String visitBool_literal(DECAFParser.Bool_literalContext ctx) {
 		// TODO Auto-generated method stub
 		return super.visitBool_literal(ctx);
+	}
+
+	private void handleSemanticError(String message)
+	{
+		Path file = Paths.get("ErrorLog_Syntax.log");
+		
+		try {
+            //Files.deleteIfExists(file);
+            Files.write(
+        		file,
+        		Arrays.asList("Semantic error: " + message),
+        		Charset.forName("UTF-8")
+    		);
+        } catch (IOException e) {
+            System.err.println("Something is wrong.");
+        }
 	}
 }

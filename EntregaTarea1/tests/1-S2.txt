@@ -1,5 +1,6 @@
 class Program x {
     int b;
+
     struct Juanito {
         int a;
         int b; 

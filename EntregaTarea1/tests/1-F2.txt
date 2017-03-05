@@ -1,12 +1,13 @@
 class Program x {
     int a;
 
-    void factorial ()
+    void factorial()
     {
         boolean b1;
         b2;
     }
-     void factorial ()
+
+    void factorial()
     {
         boolean b1;
         b1;
