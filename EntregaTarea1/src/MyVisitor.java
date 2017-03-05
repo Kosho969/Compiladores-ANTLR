@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-public class MyVisitor extends DECAFBaseVisitor<Integer> 
+public class MyVisitor extends DECAFBaseVisitor<String> 
 {
 	// We will need here the current environment
 	Environment currentEnvironment;
@@ -14,7 +14,7 @@ public class MyVisitor extends DECAFBaseVisitor<Integer>
 	// ADD [THIS WORDS] to the ones I think I'm going to use
 
 	@Override
-	public Integer visitProgramProduction(DECAFParser.ProgramProductionContext ctx) {
+	public String visitProgramProduction(DECAFParser.ProgramProductionContext ctx) {
 		String id = ctx.ID().getText();
 
 		currentEnvironment = new Environment(null);
@@ -23,14 +23,14 @@ public class MyVisitor extends DECAFBaseVisitor<Integer>
 	}
 
 	@Override
-	public Integer visitDeclaration(DECAFParser.DeclarationContext ctx) {
+	public String visitDeclaration(DECAFParser.DeclarationContext ctx) {
 		// TODO Auto-generated method stub
 		return super.visitDeclaration(ctx);
 	}
 
 	@Override
-	public Integer visitRegularVariableProduction(DECAFParser.RegularVariableProductionContext ctx){
-		Integer retorno = super.visitRegularVariableProduction(ctx);
+	public String visitRegularVariableProduction(DECAFParser.RegularVariableProductionContext ctx){
+		String retorno = super.visitRegularVariableProduction(ctx);
 		
 		boolean symbolAlreadyExists = false; 
 		
@@ -77,13 +77,13 @@ public class MyVisitor extends DECAFBaseVisitor<Integer>
 
 	@Override
 	// [THIS WORDS]
-	public Integer visitArrayVariableProduction(DECAFParser.ArrayVariableProductionContext ctx) {
+	public String visitArrayVariableProduction(DECAFParser.ArrayVariableProductionContext ctx) {
 		// TODO Auto-generated method stub
 		return super.visitArrayVariableProduction(ctx);
 	}
 
 	@Override
-	public Integer visitStructDeclaration(DECAFParser.StructDeclarationContext ctx) {
+	public String visitStructDeclaration(DECAFParser.StructDeclarationContext ctx) {
 		// TODO Auto-generated method stub
 		boolean symbolAlreadyExists = false; 		
 		currentEnvironment = saved;
@@ -117,14 +117,14 @@ public class MyVisitor extends DECAFBaseVisitor<Integer>
 	}
 
 	@Override
-	public Integer visitVarType(DECAFParser.VarTypeContext ctx) {
+	public String visitVarType(DECAFParser.VarTypeContext ctx) {
 		// TODO Auto-generated method stub
 		return super.visitVarType(ctx);
 	}
 
 	@Override
 	// [THIS WORDS]
-	public Integer visitMethodDeclarationProduction(DECAFParser.MethodDeclarationProductionContext ctx) {
+	public String visitMethodDeclarationProduction(DECAFParser.MethodDeclarationProductionContext ctx) {
 		// return super.visitMethodDeclarationProduction(ctx);
 		
 		boolean symbolAlreadyExists = false; 		
@@ -185,14 +185,14 @@ public class MyVisitor extends DECAFBaseVisitor<Integer>
 	}
 
 	@Override
-	public Integer visitMethodType(DECAFParser.MethodTypeContext ctx) {
+	public String visitMethodType(DECAFParser.MethodTypeContext ctx) {
 		// TODO Auto-generated method stub
 		return super.visitMethodType(ctx);
 	}
 
 	@Override
 	// [THIS WORDS]
-	public Integer visitParameterRegularDeclaration(DECAFParser.ParameterRegularDeclarationContext ctx) {
+	public String visitParameterRegularDeclaration(DECAFParser.ParameterRegularDeclarationContext ctx) {
 		// TODO Auto-generated method stub
 		
 		boolean symbolAlreadyExists = false; 
@@ -229,46 +229,46 @@ public class MyVisitor extends DECAFBaseVisitor<Integer>
 
 	@Override
 	// [THIS WORDS]
-	public Integer visitParameterArrayDeclaration(DECAFParser.ParameterArrayDeclarationContext ctx) {
+	public String visitParameterArrayDeclaration(DECAFParser.ParameterArrayDeclarationContext ctx) {
 		// TODO Auto-generated method stub
 		return super.visitParameterArrayDeclaration(ctx);
 	}
 
 	@Override
-	public Integer visitParameterType(DECAFParser.ParameterTypeContext ctx) {
+	public String visitParameterType(DECAFParser.ParameterTypeContext ctx) {
 		// TODO Auto-generated method stub
 		return super.visitParameterType(ctx);
 	}
 
 	@Override
-	public Integer visitBlock(DECAFParser.BlockContext ctx) {
+	public String visitBlock(DECAFParser.BlockContext ctx) {
 		// TODO Auto-generated method stub
 		return super.visitBlock(ctx);
 	}
 
 	@Override
-	public Integer visitStatement(DECAFParser.StatementContext ctx) {
+	public String visitStatement(DECAFParser.StatementContext ctx) {
 		// TODO Auto-generated method stub
 		return super.visitStatement(ctx);
 	}
 
 	@Override
 	// [THIS WORDS]
-	public Integer visitAssignationProduction(DECAFParser.AssignationProductionContext ctx) {
+	public String visitAssignationProduction(DECAFParser.AssignationProductionContext ctx) {
 		// TODO Auto-generated method stub
 		return super.visitAssignationProduction(ctx);
 	}
 
 	@Override
 	// [THIS WORDS]
-	public Integer visitWhileBlockProduction(DECAFParser.WhileBlockProductionContext ctx) {
+	public String visitWhileBlockProduction(DECAFParser.WhileBlockProductionContext ctx) {
 		// TODO Auto-generated method stub
 		return super.visitWhileBlockProduction(ctx);
 	}
 
 	@Override
 	// [THIS WORDS]
-	public Integer visitReturnBlockProduction(DECAFParser.ReturnBlockProductionContext ctx, String test) {
+	public String visitReturnBlockProduction(DECAFParser.ReturnBlockProductionContext ctx, String test) {
 		System.out.println("Visitando return con: " + test);
 		
 		// TODO: Comparar el resultado de super.visitReturnBlockProduction(ctx, test);
@@ -278,39 +278,39 @@ public class MyVisitor extends DECAFBaseVisitor<Integer>
 	}
 
 	@Override
-	public Integer visitPrint(DECAFParser.PrintContext ctx) {
+	public String visitPrint(DECAFParser.PrintContext ctx) {
 		// TODO Auto-generated method stub
 		return super.visitPrint(ctx);
 	}
 
 	@Override
 	// [THIS WORDS]
-	public Integer visitIfProduction(DECAFParser.IfProductionContext ctx) {
+	public String visitIfProduction(DECAFParser.IfProductionContext ctx) {
 		// TODO Auto-generated method stub
 		return super.visitIfProduction(ctx);
 	}
 
 	@Override
-	public Integer visitLocation(DECAFParser.LocationContext ctx) {
+	public String visitLocation(DECAFParser.LocationContext ctx) {
 		// TODO Auto-generated method stub
 		return super.visitLocation(ctx);
 	}
 
 	@Override
-	public Integer visitDotLocation(DECAFParser.DotLocationContext ctx) {
+	public String visitDotLocation(DECAFParser.DotLocationContext ctx) {
 		// TODO Auto-generated method stub
 		return super.visitDotLocation(ctx);
 	}
 
 	@Override
-	public Integer visitDeclaredVariable(DECAFParser.DeclaredVariableContext ctx) {
+	public String visitDeclaredVariable(DECAFParser.DeclaredVariableContext ctx) {
 		// TODO Auto-generated method stub
 		return super.visitDeclaredVariable(ctx);
 	}
 
 	@Override
 	// [THIS WORDS]
-	public Integer visitDeclaredVariableProduction(DECAFParser.DeclaredVariableProductionContext ctx) {
+	public String visitDeclaredVariableProduction(DECAFParser.DeclaredVariableProductionContext ctx) {
 		// TODO Auto-generated method stub
 		boolean symbolAlreadyExists = false; 
 		String variableName = ctx.ID().getText();
@@ -323,8 +323,10 @@ public class MyVisitor extends DECAFBaseVisitor<Integer>
 			
 		}
 		if(!symbolAlreadyExists){
-			System.out.print(variableName+"\n");
-			System.out.print("No existe la variable \n");
+			System.out.print("Error en la linea: "
+				+ctx.getStart().getLine()
+				+"\n "
+				+ "La variable: "+variableName+" no ha sido declarada");
 		}
 		// TODO: Paso número tres, agregar validación para determinar si variable existe
 		return super.visitDeclaredVariableProduction(ctx);
@@ -332,208 +334,258 @@ public class MyVisitor extends DECAFBaseVisitor<Integer>
 
 	@Override
 	// [THIS WORDS]
-	public Integer visitDeclaredArrayProduction(DECAFParser.DeclaredArrayProductionContext ctx) {
+	public String visitDeclaredArrayProduction(DECAFParser.DeclaredArrayProductionContext ctx) {
 		// TODO Auto-generated method stub
 		return super.visitDeclaredArrayProduction(ctx);
 	}
 
 	@Override
-	public Integer visitExpressionInP(DECAFParser.ExpressionInPContext ctx) {
+	public String visitExpressionInP(DECAFParser.ExpressionInPContext ctx) {
 		// TODO Auto-generated method stub
 		return super.visitExpressionInP(ctx);
 	}
 
 	@Override
-	public Integer visitNExpression(DECAFParser.NExpressionContext ctx) {
+	public String visitNExpression(DECAFParser.NExpressionContext ctx) {
 		// TODO Auto-generated method stub
 		return super.visitNExpression(ctx);
 	}
 
 	@Override
 	// [THIS WORDS]
-	public Integer visitOrProduction(DECAFParser.OrProductionContext ctx) {
+	public String visitOrProduction(DECAFParser.OrProductionContext ctx) {
 		// TODO Auto-generated method stub
-		return super.visitOrProduction(ctx);
+		String expression = visit(ctx.getChild(0));
+		String or = visit(ctx.getChild(1));
+		String andExpression = visit(ctx.getChild(2));
+		if(!expression.equals(andExpression)){
+			System.out.println("Error Expected Type Boolean");
+		}
+		return expression;
 	}
 
 	@Override
 	// [THIS WORDS]
-	public Integer visitAndExpr(DECAFParser.AndExprContext ctx) {
+	public String visitAndExpr(DECAFParser.AndExprContext ctx) {
 		// TODO Auto-generated method stub
-		ctx.andExpression();
-		return super.visitAndExpr(ctx);
+		String andExpression = visitChildren(ctx);
+		return andExpression;
 	}
 
 	@Override
 	// [THIS WORDS]
-	public Integer visitEqualsExpr(DECAFParser.EqualsExprContext ctx) {
+	public String visitEqualsExpr(DECAFParser.EqualsExprContext ctx) {
 		// TODO Auto-generated method stub
-		ctx.equalsExpression();
-		return super.visitEqualsExpr(ctx);
+		String equalsExpression = visitChildren(ctx);
+		return equalsExpression;
 	}
 
 	@Override
 	// [THIS WORDS]
-	public Integer visitAndProduction(DECAFParser.AndProductionContext ctx) {
+	public String visitAndProduction(DECAFParser.AndProductionContext ctx) {
 		// TODO Auto-generated method stub
-		return super.visitAndProduction(ctx);
+		
+		String andExpression = visit(ctx.getChild(0));
+		String and = visit(ctx.getChild(1));
+		String equalsExpression = visit(ctx.getChild(2));
+		if(andExpression.equals(equalsExpression)){
+			return andExpression;
+			
+		}
+		System.out.println("Error Expected Type Boolean");
+		return "Error";
 	}
 
 	@Override
 	// [THIS WORDS]
-	public Integer visitEqualsProduction(DECAFParser.EqualsProductionContext ctx) {
+	public String visitEqualsProduction(DECAFParser.EqualsProductionContext ctx) {
 		// TODO Auto-generated method stub
-		return super.visitEqualsProduction(ctx);
+		String equalsExpression = visit(ctx.getChild(0));
+		String equal = visit(ctx.getChild(1));
+		String relationExpression = visit(ctx.getChild(2));
+		if(!(equalsExpression.equals(relationExpression))){
+			
+			System.out.println("Error Expected Type Boolean");
+			return ("Error");
+		}
+		return equalsExpression;
 	}
 
 	@Override
 	// [THIS WORDS]
-	public Integer visitRelationExpr(DECAFParser.RelationExprContext ctx) {
+	public String visitRelationExpr(DECAFParser.RelationExprContext ctx) {
 		// TODO Auto-generated method stub
-		ctx.relationExpression();
-		return super.visitRelationExpr(ctx);
+		String relationExpression = visitChildren(ctx);
+		return relationExpression;
 	}
 
 	@Override
 	// [THIS WORDS]
-	public Integer visitAddSubsExpr(DECAFParser.AddSubsExprContext ctx) {
+	public String visitAddSubsExpr(DECAFParser.AddSubsExprContext ctx) {
 		// TODO Auto-generated method stub
-		ctx.addSubsExpression();
-		return super.visitAddSubsExpr(ctx);
+		String additionSubsExpression = visitChildren(ctx);
+		return additionSubsExpression;
 	}
 
 	@Override
 	// [THIS WORDS]
-	public Integer visitRelationProduction(DECAFParser.RelationProductionContext ctx) {
+	public String visitRelationProduction(DECAFParser.RelationProductionContext ctx) {
 		// TODO Auto-generated method stub
-		ctx.relationExpression();
-		ctx.rel_op().getText();
-		ctx.addSubsExpression();
-		return super.visitRelationProduction(ctx);
+		String relationExpression = visit(ctx.getChild(0));
+		String relation = visit(ctx.getChild(1));
+		String additionSubsExpression = visit(ctx.getChild(2));
+		if(!relationExpression.equals(additionSubsExpression)){
+			System.out.println("Error Expected Type Boolean at line: "+ctx.getStart().getLine());
+		}
+		return relationExpression;
 	}
 
 	@Override
 	// [THIS WORDS]
-	public Integer visitAddSubProduction(DECAFParser.AddSubProductionContext ctx) {
+	public String visitAddSubProduction(DECAFParser.AddSubProductionContext ctx) {
 		// TODO Auto-generated method stub
-		return super.visitAddSubProduction(ctx);
+		String additionSubsExpression = visit(ctx.getChild(0));
+		String arithmetic = visit(ctx.getChild(1));
+		String multDivExpression = visit(ctx.getChild(2));
+		if(!additionSubsExpression.equals(multDivExpression)){
+			System.out.println("Error Expected Type INTEGER at line: "+ctx.getStart().getLine());
+		}
+		return additionSubsExpression;
 	}
 
 	@Override
 	// [THIS WORDS]
-	public Integer visitMulDivExpr(DECAFParser.MulDivExprContext ctx) {
+	public String visitMulDivExpr(DECAFParser.MulDivExprContext ctx) {
 		// TODO Auto-generated method stub
-		ctx.mulDivExpression();
-		return super.visitMulDivExpr(ctx);
+		String multDivExpression = visitChildren(ctx);
+		return multDivExpression;
 	}
 
 	@Override
 	// [THIS WORDS]
-	public Integer visitPrExpr(DECAFParser.PrExprContext ctx) {
+	public String visitPrExpr(DECAFParser.PrExprContext ctx) {
 		// TODO Auto-generated method stub
-		ctx.prExpression();
-		return super.visitPrExpr(ctx);
+		String percentageExpression = visitChildren(ctx);
+		return percentageExpression;
 	}
 
 	@Override
 	// [THIS WORDS]
-	public Integer visitMulDivProduction(DECAFParser.MulDivProductionContext ctx) {
+	public String visitMulDivProduction(DECAFParser.MulDivProductionContext ctx) {
 		// TODO Auto-generated method stub
-		return super.visitMulDivProduction(ctx);
+		String multDivExpression = visit(ctx.getChild(0));
+		String mdOperator = visit(ctx.getChild(1));
+		String percentageExpression = visit(ctx.getChild(2));
+		if(!multDivExpression.equals(percentageExpression)){
+			System.out.println("Error Expected Type Boolean at line: "+ctx.getStart().getLine());
+		}
+		return multDivExpression;
 	}
 
 	@Override
-	public Integer visitPrExpression(DECAFParser.PrExpressionContext ctx) {
+	public String visitPrExpression(DECAFParser.PrExpressionContext ctx) {
 		// TODO Auto-generated method stub
-		ctx.basicExpression();
-		return super.visitPrExpression(ctx);
+		if(ctx.getChildCount()==3){
+			String percentageExpression = visit(ctx.getChild(0));
+			String percent = visit(ctx.getChild(1));
+			String basicExpression = visit(ctx.getChild(2));
+			if(!percentageExpression.equals(basicExpression)){
+				System.out.println("Error Expected Type Boolean at line: "+ctx.getStart().getLine());
+			}
+			return percentageExpression;
+		}
+		else{
+			String basicExpression = visitChildren(ctx);
+			return basicExpression;
+		}
 	}
 
 	@Override
-	public Integer visitBasicExpression(DECAFParser.BasicExpressionContext ctx) {
-		// TODO Auto-generated method stub
-		ctx.basic();
-		return super.visitBasicExpression(ctx);
+	public String visitBasicExpression(DECAFParser.BasicExpressionContext ctx) {
+		// TODO Auto-generated method stu
+		String basic = visitChildren(ctx);
+		return basic;
 	}
 
 	@Override
-	public Integer visitBasic(DECAFParser.BasicContext ctx) {
+	public String visitBasic(DECAFParser.BasicContext ctx) {
 		// TODO Auto-generated method stub
 		ctx.literal();
 		return super.visitBasic(ctx);
 	}
 
 	@Override
-	public Integer visitArg(DECAFParser.ArgContext ctx) {
+	public String visitArg(DECAFParser.ArgContext ctx) {
 		// TODO Auto-generated method stub
 		return super.visitArg(ctx);
 	}
 
 	@Override
-	public Integer visitMethodCallProduction(DECAFParser.MethodCallProductionContext ctx) {
+	public String visitMethodCallProduction(DECAFParser.MethodCallProductionContext ctx) {
 		// TODO Auto-generated method stub
 		return super.visitMethodCallProduction(ctx);
 	}
 
 	@Override
-	public Integer visitArith_op(DECAFParser.Arith_opContext ctx) {
+	public String visitArith_op(DECAFParser.Arith_opContext ctx) {
 		// TODO Auto-generated method stub
 		return super.visitArith_op(ctx);
 	}
 
 	@Override
-	public Integer visitMd_op(DECAFParser.Md_opContext ctx) {
+	public String visitMd_op(DECAFParser.Md_opContext ctx) {
 		// TODO Auto-generated method stub
 		return super.visitMd_op(ctx);
 	}
 
 	@Override
-	public Integer visitPr_op(DECAFParser.Pr_opContext ctx) {
+	public String visitPr_op(DECAFParser.Pr_opContext ctx) {
 		// TODO Auto-generated method stub
 		return super.visitPr_op(ctx);
 	}
 
 	@Override
-	public Integer visitRel_op(DECAFParser.Rel_opContext ctx) {
+	public String visitRel_op(DECAFParser.Rel_opContext ctx) {
 		// TODO Auto-generated method stub
 		return super.visitRel_op(ctx);
 	}
 
 	@Override
-	public Integer visitEq_op(DECAFParser.Eq_opContext ctx) {
+	public String visitEq_op(DECAFParser.Eq_opContext ctx) {
 		// TODO Auto-generated method stub
 		return super.visitEq_op(ctx);
 	}
 
 	@Override
-	public Integer visitCond_op(DECAFParser.Cond_opContext ctx) {
+	public String visitCond_op(DECAFParser.Cond_opContext ctx) {
 		// TODO Auto-generated method stub
 		return super.visitCond_op(ctx);
 	}
 
 	@Override
-	public Integer visitLiteral(DECAFParser.LiteralContext ctx) {
+	public String visitLiteral(DECAFParser.LiteralContext ctx) {
 		// TODO Auto-generated method stub
-		ctx.int_literal();
-		return super.visitLiteral(ctx);
+		String bool = "boolean";
+		//ctx.int_literal();
+		return bool;
 	}
 
 	@Override
-	public Integer visitInt_literal(DECAFParser.Int_literalContext ctx) {
+	public String visitInt_literal(DECAFParser.Int_literalContext ctx) {
 		// TODO Auto-generated method stub
 		ctx.getText();
-		System.out.println("Es integer "+ctx.getText());
+		System.out.println("Es String "+ctx.getText());
 		return super.visitInt_literal(ctx);
 	}
 
 	@Override
-	public Integer visitChar_literal(DECAFParser.Char_literalContext ctx) {
+	public String visitChar_literal(DECAFParser.Char_literalContext ctx) {
 		// TODO Auto-generated method stub
 		return super.visitChar_literal(ctx);
 	}
 
 	@Override
-	public Integer visitBool_literal(DECAFParser.Bool_literalContext ctx) {
+	public String visitBool_literal(DECAFParser.Bool_literalContext ctx) {
 		// TODO Auto-generated method stub
 		return super.visitBool_literal(ctx);
 	}
