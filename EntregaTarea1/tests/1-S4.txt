@@ -1,0 +1,12 @@
+class Program x {
+    int a;
+
+    struct a {
+        boolean b1;
+    }
+
+    void a()
+    {
+        boolean b1;
+    }
+}

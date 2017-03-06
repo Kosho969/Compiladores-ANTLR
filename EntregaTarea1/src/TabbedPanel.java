@@ -146,12 +146,13 @@ class TabbedPanel extends JFrame
             for (int i = 0; i < errors.size(); i++) {
                 areaError.append("(" + (i + 1) + "): " + errors.get(i) + "\n");
             }
-            
+            areaError.append(visitor.errors.toString());
             return 1;
         } catch ( IOException e ) {
             areaError.setText(" NO ERRORS ");
             
             return 0;
         }
+        
     }
 }

@@ -25,23 +25,63 @@ public class Environment {
 		return symbolTable;
 	}
 
-	public void setSymbolTable(ArrayList<TableEntry> symbolTable) {
+	public void setSymbolTable(ArrayList<TableEntry> symbolTable)
+	{
 		this.symbolTable = symbolTable;
 	}
 	
-	public void putSymbol(String type,String lexema, Symbol s){
+	public void putSymbol(String type, String lexema, Symbol s)
+	{
 		this.symbolTable.add(new TableEntry(type, lexema, s));
 	}
 	
-	public Symbol getSymbol(String name,String type){
-		for (int i = 0; i < symbolTable.size(); i++){
-			TableEntry symbolLooking = symbolTable.get(i);
+	public Symbol getSymbol(String name, String type)
+	{
+		for (int i = 0; i < symbolTable.size(); i++) {
+			TableEntry currentTableEntry = symbolTable.get(i);
 
-			if (symbolLooking.getLexem().equals(name) && (symbolLooking.getType().equals(type))){
-				return symbolLooking.getValue();
+			if (
+				currentTableEntry.getLexem().equals(name)
+					&& currentTableEntry.getType().equals(type)
+			) {
+				return currentTableEntry.getValue();
 			}
+		}
+		
+		// Si estoy en este punto, es porque la tabla de simbolos
+		// del entorno actual no tiene lo que yo quería, por tanto
+		// buscar en la posible tabla padre
+		if (null != this.parent) {
+			return this.parent.getSymbol(name, type);
 		}
 
 		return null;
+	}
+	
+	public boolean hasSymbol(String name, String type)
+	{
+		return null != getSymbol(name, type);
+	}
+	
+	public void print()
+	{
+		System.out.println("Dumping environment");
+
+		for (int i = 0; i < symbolTable.size(); i++){
+			TableEntry currentTableEntry = symbolTable.get(i);
+
+			System.out.println(
+				"Type: '" + currentTableEntry.type +
+				"', Name: '"+ currentTableEntry.lexem +
+				"', Symbol: '"+ currentTableEntry.value +"'"
+			);
+		}
+		
+		if (null != this.parent) {
+			System.out.println("");
+			System.out.println("Dumping parent");
+			
+			this.parent.print();
+		}
 	}
 }

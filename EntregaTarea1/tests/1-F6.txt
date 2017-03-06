@@ -1,0 +1,11 @@
+class Program x {
+    void a()
+    {
+        boolean b1;
+    }
+
+    void a()
+    {
+        boolean b1;
+    }
+}

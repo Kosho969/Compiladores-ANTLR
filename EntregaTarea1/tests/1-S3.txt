@@ -1,0 +1,8 @@
+class Program x {
+    int a;
+
+    void a()
+    {
+        boolean b1;
+    }
+}

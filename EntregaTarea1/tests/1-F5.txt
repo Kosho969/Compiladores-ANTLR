@@ -1,0 +1,9 @@
+class Program x {
+    struct a {
+        boolean b1;
+    }
+
+    struct a {
+        boolean b1;
+    }
+}

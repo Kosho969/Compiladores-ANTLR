@@ -3,6 +3,6 @@ class Program x {
 
     struct Juanito {
         int a;
-        int b; 
+        int b;
     }
 }

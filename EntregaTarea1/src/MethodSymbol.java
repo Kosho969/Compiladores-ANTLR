@@ -2,10 +2,17 @@ import java.util.ArrayList;
 
 public class MethodSymbol extends Symbol {
 
-	// Parametros de un método. 
+	// Parametros de un método 
 	ArrayList<VariableSymbol> firm = new ArrayList<VariableSymbol>();
 	
-	public MethodSymbol(ArrayList<VariableSymbol> firm) {
+	public MethodSymbol(
+		String type,
+		String name,
+		boolean isStruct,
+		ArrayList<VariableSymbol> firm
+	) {
+		super(type, name, isStruct);
+
 		this.firm = firm;
 	}
 
@@ -15,5 +22,9 @@ public class MethodSymbol extends Symbol {
 
 	public void setFirm(ArrayList<VariableSymbol> firm) {
 		this.firm = firm;
+	}
+	int a;
+	public void sum(){
+		boolean a;
 	}
 }

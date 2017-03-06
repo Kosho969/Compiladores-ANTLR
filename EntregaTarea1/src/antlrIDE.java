@@ -13,12 +13,13 @@ public class antlrIDE
 	
 		// TODO: Remove this stuff
 		try {
-			panel.areaTest.setText(antlrIDE.readFile("tests/1-F3.txt"));
+			// TODO: Agregar for para testear todas las pruebas dentro de la carpeta "tests"
+			panel.areaTest.setText(antlrIDE.readFile("tests/n-SF.txt"));
 			panel.tabbedPane.setSelectedIndex(2);
 
 			// If success, exit
 			if (0 == panel.readToTree()) {
-				//System.exit(0);
+				System.exit(0);
 			}
 		} catch (IOException e) {
 		}

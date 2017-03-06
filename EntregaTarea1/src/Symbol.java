@@ -1,5 +1,14 @@
 
-public class Symbol {
+public class Symbol
+{
+	/**
+	 * Cuando el simbolo es de una variable, aquí guardamos el tipo de la variable.
+	 * 
+	 * Cuando el simbolo es de un método, aquí guardamos el tipo de retorno del método.
+	 * 
+	 * Cuando el símbolo es de un struct, aquí guardamos el nombre del struct,
+	 * que de ahora en adelante será un tipo de simbolo válido.
+	 */
 	String type;
 
 	String name;
@@ -43,5 +52,10 @@ public class Symbol {
 
 	public void setStruct(boolean isStruct) {
 		this.isStruct = isStruct;
-	}		
+	}
+	
+	public String toString()
+	{
+		return this.name + " (" + this.type + ")";
+	}
 }

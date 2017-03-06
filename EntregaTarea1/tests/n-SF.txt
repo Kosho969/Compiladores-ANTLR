@@ -1,0 +1,11 @@
+class Program x {
+    int a;
+
+    void sum()
+    {
+        boolean c;
+        int b;
+        (!b);
+        (-c);
+    }
+}

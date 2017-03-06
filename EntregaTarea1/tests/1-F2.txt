@@ -1,15 +1,9 @@
 class Program x {
     int a;
 
-    void factorial()
-    {
-        boolean b1;
-        b2;
-    }
+    struct Juanito {
+        boolean algo;
 
-    void factorial()
-    {
-        boolean b1;
-        b1;
+        boolean algo;
     }
 }
