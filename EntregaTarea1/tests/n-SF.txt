@@ -1,11 +1,14 @@
 class Program x {
-    int a;
+    int a[3];
 
     void sum()
     {
         boolean c;
         int b;
-        (!b);
-        (-c);
+        a[true];
+        1 == true;
+        while (b){
+        }
+
     }
 }

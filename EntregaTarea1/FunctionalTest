@@ -1,0 +1,24 @@
+class Program x {
+    int i;
+    void main(){
+
+    }
+    int fac (int n)
+    {
+        if (n==0 || n ==1)
+        {
+            return 1;
+        } else {
+            return n * fac(n-1);
+        }
+    }
+    void factorial ()
+    {
+        int j;
+        while (i < 10) 
+        {
+            j = fac(i);
+        }
+        
+    }
+}

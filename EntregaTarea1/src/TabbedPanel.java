@@ -149,9 +149,9 @@ class TabbedPanel extends JFrame
             areaError.append(visitor.errors.toString());
             return 1;
         } catch ( IOException e ) {
-            areaError.setText(" NO ERRORS ");
-            
-            return 0;
+            areaError.setText(" No Syntactic Errors \n ");
+            areaError.append(visitor.errors.toString());
+            return 1;
         }
         
     }
