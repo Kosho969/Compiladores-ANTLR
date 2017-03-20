@@ -23,8 +23,4 @@ public class MethodSymbol extends Symbol {
 	public void setFirm(ArrayList<VariableSymbol> firm) {
 		this.firm = firm;
 	}
-	int a;
-	public void sum(){
-		boolean a;
-	}
 }

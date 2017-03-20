@@ -1,8 +1,8 @@
 class Program x {
     int a;
 
-    void sum(int a)
+    void sum(int b)
     {
-        a;
+        int a;
     }
 }

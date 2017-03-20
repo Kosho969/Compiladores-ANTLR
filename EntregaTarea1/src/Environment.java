@@ -57,10 +57,28 @@ public class Environment {
 
 		return null;
 	}
+	public Symbol getSymbol2(String name, String type)
+	{
+		for (int i = 0; i < symbolTable.size(); i++) {
+			TableEntry currentTableEntry = symbolTable.get(i);
+
+			if (
+				currentTableEntry.getLexem().equals(name)
+					&& currentTableEntry.getType().equals(type)
+			) {
+				return currentTableEntry.getValue();
+			}
+		}
+		return null;
+	}
 	
 	public boolean hasSymbol(String name, String type)
 	{
 		return null != getSymbol(name, type);
+	}
+	public boolean hasSymbol2(String name, String type)
+	{
+		return null != getSymbol2(name, type);
 	}
 	
 	public void print()

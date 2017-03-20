@@ -1,14 +1,13 @@
 class Program x {
     int a[3];
 
-    void sum()
+    struct sum
     {
         boolean c;
         int b;
-        a[true];
-        1 == true;
-        while (b){
-        }
-
+    }
+    void main(){
+        struct sum x;
+        x.c;
     }
 }

@@ -35,8 +35,10 @@ public class MyVisitor extends DECAFBaseVisitor<String>
 		String result = visitChildren(ctx);
 		MethodSymbol mainOne = (MethodSymbol) currentEnvironment.getSymbol("main", "method");
 		//System.out.println(mainOne.getFirm());
-		if(currentEnvironment.hasSymbol("main", "method") && mainOne.getFirm().isEmpty()){
+		currentEnvironment.print();
+		if(currentEnvironment.hasSymbol("main", "method")){
 			printLine("Ejecucion correcta! ");
+			handleSemanticError("Correct");
 			return "void";
 		}
 		handleSemanticError("Expected main method without parameters");
@@ -53,8 +55,11 @@ public class MyVisitor extends DECAFBaseVisitor<String>
 	public String visitRegularVariableProduction(DECAFParser.RegularVariableProductionContext ctx)
 	{
 		String retorno = super.visitRegularVariableProduction(ctx); 
-		String symbolType = ctx.varType().getText();
+		String symbolType = visit(ctx.varType());
 		String identifier = ctx.ID().getText();
+		/*if(symbolType.contains("struct")){
+			symbolType = "struct";
+		}*/
 		VariableSymbol currentSymbol = new VariableSymbol(
 			symbolType,
 			identifier,
@@ -62,7 +67,7 @@ public class MyVisitor extends DECAFBaseVisitor<String>
 			false
 		);
 		
-		if (currentEnvironment.hasSymbol(identifier, "variable")) {
+		if (currentEnvironment.hasSymbol2(identifier, "variable")) {
 			handleSemanticError("Line: "+ctx.getStart().getLine() 
 					+
 				" Identificador '" + identifier + "' ya utilizado en entorno actual"
@@ -152,6 +157,7 @@ public class MyVisitor extends DECAFBaseVisitor<String>
 		// Visitar el cuerpo del struct
 		String result = super.visitStructDeclaration(ctx);
 
+		currentEnvironment.print();
 		// Regresar el entorno pusheado al entorno actual
 		currentEnvironment = environmentsStack.pop();
 		
@@ -161,7 +167,12 @@ public class MyVisitor extends DECAFBaseVisitor<String>
 	@Override
 	public String visitVarType(DECAFParser.VarTypeContext ctx) {
 		// TODO Auto-generated method stub
-		return super.visitVarType(ctx);
+		if(ctx.getText().contains("struct")){
+			System.out.println("VarType");
+			System.out.println(ctx.ID().getText());
+			return ctx.ID().getText();
+		}
+		return ctx.getText();
 	}
 
 	@Override
@@ -267,7 +278,7 @@ public class MyVisitor extends DECAFBaseVisitor<String>
 			false
 		);
 		
-		if (currentEnvironment.hasSymbol(parameterIdentifier, "variable")) {
+		if (currentEnvironment.hasSymbol2(parameterIdentifier, "variable")) {
 			handleSemanticError("Line: "+ctx.getStart().getLine() 
 				+" Identificador '" + parameterIdentifier + "' ya utilizado en entorno actual"
 			);
@@ -412,7 +423,26 @@ public class MyVisitor extends DECAFBaseVisitor<String>
 	@Override
 	public String visitDotLocation(DECAFParser.DotLocationContext ctx) {
 		// TODO Auto-generated method stub
-		return super.visitDotLocation(ctx);
+		currentEnvironment.print();
+		System.out.println("dotLocation");
+		String typeLeft = visit(ctx.variable());
+		String typeRight = visit(ctx.location());
+		if(currentEnvironment.hasSymbol(typeLeft, "struct")){
+			System.out.println("STRUCTS");
+			System.out.println(typeLeft);
+			System.out.println(currentEnvironment.getSymbol(typeLeft,"struct" ));
+			if(typeLeft.equals(typeRight)){
+				System.out.println("STRUCTS");
+				System.out.println(typeRight);
+				return typeRight;
+			}
+			else{
+				return "Error";
+			}
+		}
+		else{
+			return "Error";
+		}
 	}
 
 	@Override
@@ -425,7 +455,7 @@ public class MyVisitor extends DECAFBaseVisitor<String>
 	public String visitDeclaredVariableProduction(DECAFParser.DeclaredVariableProductionContext ctx)
 	{
 		String variableName = ctx.ID().getText();
-		currentEnvironment.print();
+		//currentEnvironment.print();
 
 		if (!currentEnvironment.hasSymbol(variableName, "variable"))
 		{
@@ -448,7 +478,7 @@ public class MyVisitor extends DECAFBaseVisitor<String>
 	public String visitDeclaredArrayProduction(DECAFParser.DeclaredArrayProductionContext ctx) {
 		// TODO Auto-generated method stub
 		String variableName = ctx.ID().getText();
-		currentEnvironment.print();
+		//currentEnvironment.print();
 
 		if (!currentEnvironment.hasSymbol(variableName, "variable"))
 		{
@@ -483,6 +513,7 @@ public class MyVisitor extends DECAFBaseVisitor<String>
 		return type ;
 	}
 
+	
 	@Override
 	public String visitExpressionInP(DECAFParser.ExpressionInPContext ctx) {
 		// TODO Auto-generated method stub
@@ -773,7 +804,7 @@ public class MyVisitor extends DECAFBaseVisitor<String>
 	public String visitMethodCallProduction(DECAFParser.MethodCallProductionContext ctx) {
 		// TODO Auto-generated method stub
 		String variableName = ctx.ID().getText();
-		currentEnvironment.print();
+		//currentEnvironment.print();
 
 		if (!currentEnvironment.hasSymbol(variableName, "method"))
 		{
