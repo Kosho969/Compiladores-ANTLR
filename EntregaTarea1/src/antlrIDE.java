@@ -14,7 +14,7 @@ public class antlrIDE
 		// TODO: Remove this stuff
 		try {
 			// TODO: Agregar for para testear todas las pruebas dentro de la carpeta "tests"
-			panel.areaTest.setText(antlrIDE.readFile("tests/n-SF.txt"));
+			panel.areaTest.setText(antlrIDE.readFile("FactorialArray.txt"));
 			panel.tabbedPane.setSelectedIndex(2);
 
 			// If success, exit

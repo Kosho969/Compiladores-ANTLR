@@ -6,7 +6,8 @@ class Program x {
         boolean c;
         int b;
     }
-    void main(){
+
+    void main() {
         struct sum x;
         x.c;
     }

@@ -118,7 +118,7 @@ class TabbedPanel extends JFrame
         parser.addErrorListener(miErrorListener);
 
         ParseTree tree = parser.program();
-
+        
         MyVisitor visitor = new MyVisitor();
 		visitor.visit(tree);
 
