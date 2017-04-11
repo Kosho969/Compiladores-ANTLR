@@ -19,13 +19,18 @@ public class MyVisitor extends DECAFBaseVisitor<String>
 {
 	// We will need here the current environment
 	Environment currentEnvironment = null;
-	Stack<Environment> environmentsStack = new Stack<Environment>(); 
-	public StringBuffer errors = new StringBuffer("\n Semantic Errors: \n");
-	int n = 0;
-	String methodType ="";
-	int offset = 0;
 
-	// ADD [THIS WORDS] to the ones I think I'm going to use
+	Stack<Environment> environmentsStack = new Stack<Environment>(); 
+
+	public StringBuffer errors = new StringBuffer("\n Semantic Errors: \n");
+
+	int n = 0;
+
+	String methodType ="";
+
+	int offset = 0;
+	
+	ArrayList<String> codigoIntermedioArrayList = new ArrayList<String>();
 
 	@Override
 	public String visitProgramProduction(DECAFParser.ProgramProductionContext ctx) {
@@ -60,9 +65,7 @@ public class MyVisitor extends DECAFBaseVisitor<String>
 		String retorno = super.visitRegularVariableProduction(ctx); 
 		String symbolType = visit(ctx.varType());
 		String identifier = ctx.ID().getText();
-		/*if(symbolType.contains("struct")){
-			symbolType = "struct";
-		}*/
+
 		VariableSymbol currentSymbol = new VariableSymbol(
 			symbolType,
 			identifier,
@@ -71,9 +74,12 @@ public class MyVisitor extends DECAFBaseVisitor<String>
 		);
 		
 		if (currentEnvironment.hasSymbol2(identifier, "variable")) {
-			handleSemanticError("Line: "+ctx.getStart().getLine() 
-					+
-				" Identificador '" + identifier + "' ya utilizado en entorno actual"
+			handleSemanticError(
+				"Line: "
+					+ ctx.getStart().getLine() 
+					+ " Identificador '"
+					+ identifier
+					+ "' ya utilizado en entorno actual"
 			);
 			
 			return "";
@@ -81,12 +87,13 @@ public class MyVisitor extends DECAFBaseVisitor<String>
 		
 		// Paso número tres, agregar validación para determinar si variable existe
 		currentEnvironment.putSymbol2("variable", identifier, currentSymbol,offset);
-		if(symbolType.equals("int")){
+		if (symbolType.equals("int")){
 			offset = offset + 4;
 		}
 
 		return retorno;
 	}
+	
 	@Override
 	// [THIS WORDS]
 	public String visitArrayVariableProduction(DECAFParser.ArrayVariableProductionContext ctx) {
@@ -188,19 +195,23 @@ public class MyVisitor extends DECAFBaseVisitor<String>
 		String symbolType = ctx.methodType().getText();
 		methodType = symbolType;
 		String identifier = ctx.ID().getText();
+		
+		createStartFunctionLabel(identifier);
 
 		// Verificar que el nombre del método no haya sido usado
 		// en una declaración previa del entorno actual
 		if (currentEnvironment.hasSymbol(identifier, "method")) {
-			handleSemanticError("Line: "+ctx.getStart().getLine() 
-					+
-				" Identificador '" + identifier + "' para método ya utilizado en entorno actual"
+			handleSemanticError(
+				"Line: "
+					+ ctx.getStart().getLine() 
+					+ " Identificador '"
+					+ identifier
+					+ "' para método ya utilizado en entorno actual"
 			);
 			
 			return "";
 		}
-		printLine("Antes del metodo: ");
-		//currentEnvironment.print();
+
 		// Mandar entorno actual al stack y crear nuevo entorno
 		environmentsStack.push(currentEnvironment);
 		currentEnvironment = new Environment(currentEnvironment);
@@ -233,21 +244,13 @@ public class MyVisitor extends DECAFBaseVisitor<String>
 
         }
         printLine("Post");
-        //currentEnvironment.print();
         for (int i = 0; i<currentEnvironment.getSymbolTable().size();i++){
         	VariableSymbol currentVariableSymbol= (VariableSymbol) currentEnvironment.getSymbolTable().get(i).getValue();
         	firm.add(currentVariableSymbol);
         	printLine("adding");
         	System.out.println(firm);
         }
-        printLine("Post");
-        // Visitar RPARENT
         visit(ctx.RPARENT());
-
-		// Ejecutar cosas locas
-        // Instanciar MethodSymbol
-
-		// Visitar block
 		String result = visit(ctx.block());
 
 		currentEnvironment = environmentsStack.pop();
@@ -258,8 +261,10 @@ public class MyVisitor extends DECAFBaseVisitor<String>
 			false,
 			firm
 		);
-		//System.out.println(currentSymbol.getFirm());
+		
 		currentEnvironment.putSymbol("method", identifier, currentSymbol);
+		
+		createEndFunctionLabel(identifier);
 		
 		return result;
 	}
@@ -518,7 +523,6 @@ public class MyVisitor extends DECAFBaseVisitor<String>
 		String type = currentEnvironment.getSymbol(variableName, "variable").getType();
 		return type ;
 	}
-
 	
 	@Override
 	public String visitExpressionInP(DECAFParser.ExpressionInPContext ctx) {
@@ -938,11 +942,34 @@ public class MyVisitor extends DECAFBaseVisitor<String>
 	{
 		System.out.println(message);
 	}
+
 	public static boolean isNumeric(String str)
 	{
 	  NumberFormat formatter = NumberFormat.getInstance();
 	  ParsePosition pos = new ParsePosition(0);
 	  formatter.parse(str, pos);
 	  return str.length() == pos.getIndex();
+	}
+	
+	public ArrayList<String> getCodigoIntermedioArrayList()
+	{	
+		return codigoIntermedioArrayList;
+	}
+	
+	public void appendToCodigoIntermedio(String lineaCodigo)
+	{
+		codigoIntermedioArrayList.add(lineaCodigo);
+	}
+
+	public void createStartFunctionLabel(String name){
+		String label = "FUNCTION_" + name + ":";
+
+		appendToCodigoIntermedio(label);
+	}
+	
+	public void createEndFunctionLabel(String name) {
+		String label = "END_FUNCTION_" + name + ":";
+
+		appendToCodigoIntermedio(label);		
 	}
 }

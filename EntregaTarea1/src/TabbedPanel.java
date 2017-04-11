@@ -5,6 +5,7 @@ import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.text.*;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -154,20 +155,21 @@ class TabbedPanel extends JFrame
             // Testear si no hay errores de ninguna naturaleza, y si no hay
             // hacer output de código intermedio
             if (visitor.n == 0) {
-            	generarArhivoCodigoIntermedio();
+            	generarArhivoCodigoIntermedio(
+        			visitor.getCodigoIntermedioArrayList()
+    			);
             }
             
             return 1;
         }
     }
     
-    private void generarArhivoCodigoIntermedio()
+    private void generarArhivoCodigoIntermedio(ArrayList<String> codigoIntermedioArrayList)
     {
-    	String msg = "Eureka";
     	Path file = Paths.get("intermediate_output.txt");
 
     	try {
-            Files.write(file, Arrays.asList(msg), Charset.forName("UTF-8"));
+    		Files.write(file, codigoIntermedioArrayList, Charset.forName("UTF-8"));
         } catch (IOException e) {
             System.err.println("Something is wrong.");
         }
