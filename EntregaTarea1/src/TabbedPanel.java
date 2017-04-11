@@ -98,14 +98,14 @@ class TabbedPanel extends JFrame
 
     public Integer readToTree()
     {
-        //ANTLR Tree
+        // ANTLR Tree
         ANTLRInputStream input = new ANTLRInputStream(areaTest.getText());
 
         DECAFLexer lexer = new DECAFLexer(input);
 
         BaseErrorListener miErrorListener = new ThrowingErrorListener();
 
-        // Add custom error handdlers.
+        // Add custom error handlers
         lexer.removeErrorListeners();
         lexer.addErrorListener(miErrorListener);
 
@@ -113,7 +113,7 @@ class TabbedPanel extends JFrame
 
         DECAFParser parser = new DECAFParser(tokenStream);
 
-        // Add custom error handdlers.
+        // Add custom error handlers
         parser.removeErrorListeners();
         parser.addErrorListener(miErrorListener);
 
@@ -122,37 +122,54 @@ class TabbedPanel extends JFrame
         MyVisitor visitor = new MyVisitor();
 		visitor.visit(tree);
 
-        TreeViewer viewr = new TreeViewer(
+        TreeViewer treeViewer = new TreeViewer(
             Arrays.asList(parser.getRuleNames()),
             tree
         );
 
-        //viewr.setScale(1.5); //scale a little
+        treeViewer.setSize(700, 700);
 
-        viewr.setSize(700, 700);
+        // De no poner esto, hace un arbol justo a la par
         treePanel.removeAll();
-        treePanel.add(viewr);
-
+        treePanel.add(treeViewer);
+        
+        // TODO: Agregar pane para output de código intermedio
+        
         // Read and write errors.
         try {
             areaError.setText("");
-
             errors = Files.readAllLines(file, Charset.forName("UTF-8"));
-
             Files.deleteIfExists(file);
-
-            System.out.println(errors);
 
             for (int i = 0; i < errors.size(); i++) {
                 areaError.append("(" + (i + 1) + "): " + errors.get(i) + "\n");
             }
             areaError.append(visitor.errors.toString());
+
             return 1;
         } catch ( IOException e ) {
-            areaError.setText(" No Syntactic Errors \n ");
+            areaError.setText("No syntactic errors \n ");
             areaError.append(visitor.errors.toString());
+
+            // Testear si no hay errores de ninguna naturaleza, y si no hay
+            // hacer output de código intermedio
+            if (visitor.n == 0) {
+            	generarArhivoCodigoIntermedio();
+            }
+            
             return 1;
         }
-        
+    }
+    
+    private void generarArhivoCodigoIntermedio()
+    {
+    	String msg = "Eureka";
+    	Path file = Paths.get("intermediate_output.txt");
+
+    	try {
+            Files.write(file, Arrays.asList(msg), Charset.forName("UTF-8"));
+        } catch (IOException e) {
+            System.err.println("Something is wrong.");
+        }
     }
 }

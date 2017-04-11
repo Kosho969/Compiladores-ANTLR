@@ -23,6 +23,7 @@ public class MyVisitor extends DECAFBaseVisitor<String>
 	public StringBuffer errors = new StringBuffer("\n Semantic Errors: \n");
 	int n = 0;
 	String methodType ="";
+	int offset = 0;
 
 	// ADD [THIS WORDS] to the ones I think I'm going to use
 
@@ -38,7 +39,9 @@ public class MyVisitor extends DECAFBaseVisitor<String>
 		currentEnvironment.print();
 		if(currentEnvironment.hasSymbol("main", "method")){
 			printLine("Ejecucion correcta! ");
-			handleSemanticError("Correct");
+
+			printLineToBuffer("Correct");
+
 			return "void";
 		}
 		handleSemanticError("Expected main method without parameters");
@@ -77,7 +80,10 @@ public class MyVisitor extends DECAFBaseVisitor<String>
 		}
 		
 		// Paso número tres, agregar validación para determinar si variable existe
-		currentEnvironment.putSymbol("variable", identifier, currentSymbol);
+		currentEnvironment.putSymbol2("variable", identifier, currentSymbol,offset);
+		if(symbolType.equals("int")){
+			offset = offset + 4;
+		}
 
 		return retorno;
 	}
@@ -917,23 +923,15 @@ public class MyVisitor extends DECAFBaseVisitor<String>
 	}
 
 	private void handleSemanticError(String message)
-	{
-		
+	{		
 		errors.append("["+n+"]: "+message+"\n");
-		//Path file = Paths.get("ErrorLog_Syntax.log");
-		//String newLine = System.getProperty("line.separator");
-		/*
-		try {
-            //Files.deleteIfExists(file);
-            Files.write(
-        		file,
-        		Arrays.asList("Semantic error: " + message+newLine),
-        		Charset.forName("UTF-8")
-    		);
-        } catch (IOException e) {
-            System.err.println("Something is wrong.");
-        }*/
+
 		n++;
+	}
+	
+	private void printLineToBuffer(String message)
+	{
+		errors.append(message+"\n");
 	}
 	
 	private void printLine(String message)

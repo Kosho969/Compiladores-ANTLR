@@ -9,10 +9,19 @@ public class TableEntry {
 	// Symbol that goes into the Symbol Table 
 	Symbol value;
 	
+	int size = 0;
+	
 	public TableEntry(String type, String lexem, Symbol value) {
 		this.lexem = lexem;
 		this.type = type;
 		this.value = value;
+	}
+	
+	public TableEntry(String type, String lexem, Symbol value, int size) {
+		this.lexem = lexem;
+		this.type = type;
+		this.value = value;
+		this.size = size; 
 	}
 	
 	/**
