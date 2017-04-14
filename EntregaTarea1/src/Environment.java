@@ -4,11 +4,14 @@ import java.util.ArrayList;
 public class Environment {
 
 	Environment parent;
+	
+	int currentOffset;
 
 	ArrayList<TableEntry> symbolTable = new ArrayList<TableEntry>();
 
 	public Environment(Environment parent) {
 		this.parent = parent;
+		this.currentOffset = 0;
 
 		this.symbolTable = new ArrayList<TableEntry>();
 	}
@@ -32,11 +35,16 @@ public class Environment {
 	
 	public void putSymbol(String type, String lexema, Symbol s)
 	{
-		this.symbolTable.add(new TableEntry(type, lexema, s));
-	}
-	public void putSymbol2(String type, String lexema, Symbol s,int size)
-	{
-		this.symbolTable.add(new TableEntry(type, lexema, s,size));
+		TableEntry entry = new TableEntry(type, lexema, s);
+
+		// Si el entry que estoy agregando es de tipo variable,
+		// analizar el tipo de variable, asignarle el offset y hacer
+		// el corrimiento de offset actual respectivo
+		if ("variable" == type) {
+			
+		}
+		
+		this.symbolTable.add(entry);
 	}
 	
 	public Symbol getSymbol(String name, String type)

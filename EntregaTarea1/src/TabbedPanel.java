@@ -119,20 +119,21 @@ class TabbedPanel extends JFrame
         parser.addErrorListener(miErrorListener);
 
         ParseTree tree = parser.program();
-        
-        MyVisitor visitor = new MyVisitor();
-		visitor.visit(tree);
-
         TreeViewer treeViewer = new TreeViewer(
             Arrays.asList(parser.getRuleNames()),
             tree
         );
-
         treeViewer.setSize(700, 700);
 
         // De no poner esto, hace un arbol justo a la par
         treePanel.removeAll();
         treePanel.add(treeViewer);
+        MyVisitor visitor = new MyVisitor();
+		visitor.visit(tree);
+
+        
+
+        
         
         // TODO: Agregar pane para output de código intermedio
         

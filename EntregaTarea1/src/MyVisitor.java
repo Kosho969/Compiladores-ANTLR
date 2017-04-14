@@ -27,10 +27,16 @@ public class MyVisitor extends DECAFBaseVisitor<String>
 	int n = 0;
 
 	String methodType ="";
-
-	int offset = 0;
+	
+	ArrayList<String> operadoresPrimarios = new ArrayList<String>();
+	ArrayList<String> operandos = new ArrayList<String>();
+	String operador = "";
 	
 	ArrayList<String> codigoIntermedioArrayList = new ArrayList<String>();
+	
+	
+	boolean ifExpression = false; 
+	boolean whileExpression = false; 
 
 	@Override
 	public String visitProgramProduction(DECAFParser.ProgramProductionContext ctx) {
@@ -86,10 +92,7 @@ public class MyVisitor extends DECAFBaseVisitor<String>
 		}
 		
 		// Paso número tres, agregar validación para determinar si variable existe
-		currentEnvironment.putSymbol2("variable", identifier, currentSymbol,offset);
-		if (symbolType.equals("int")){
-			offset = offset + 4;
-		}
+		currentEnvironment.putSymbol("variable", identifier, currentSymbol);
 
 		return retorno;
 	}
@@ -189,7 +192,6 @@ public class MyVisitor extends DECAFBaseVisitor<String>
 	}
 
 	@Override
-	// [THIS WORDS]
 	public String visitMethodDeclarationProduction(DECAFParser.MethodDeclarationProductionContext ctx)
 	{
 		String symbolType = ctx.methodType().getText();
@@ -230,27 +232,19 @@ public class MyVisitor extends DECAFBaseVisitor<String>
         ArrayList<VariableSymbol> firm = new ArrayList<VariableSymbol>();
         
         for (DECAFParser.ParameterContext parameter : ctx.parameter()) {
-        	printLine("Pre");
         	visit(parameter);
         	
         	DECAFParser.ParameterRegularDeclarationContext castedParameter =
         		(DECAFParser.ParameterRegularDeclarationContext) parameter;
-        	
-        	printLine("Dude!");
-        	printLine(castedParameter.parameterType().getText());
-        	printLine(castedParameter.ID().getText());
-        	printLine("End dude!");
-        	
-
         }
-        printLine("Post");
-        for (int i = 0; i<currentEnvironment.getSymbolTable().size();i++){
+
+        for (int i = 0; i < currentEnvironment.getSymbolTable().size();i++){
         	VariableSymbol currentVariableSymbol= (VariableSymbol) currentEnvironment.getSymbolTable().get(i).getValue();
         	firm.add(currentVariableSymbol);
-        	printLine("adding");
-        	System.out.println(firm);
         }
+
         visit(ctx.RPARENT());
+
 		String result = visit(ctx.block());
 
 		currentEnvironment = environmentsStack.pop();
@@ -276,7 +270,6 @@ public class MyVisitor extends DECAFBaseVisitor<String>
 	}
 
 	@Override
-	// [THIS WORDS]
 	public String visitParameterRegularDeclaration(DECAFParser.ParameterRegularDeclarationContext ctx) {
 		
 		//currentEnvironment.print();
@@ -339,6 +332,7 @@ public class MyVisitor extends DECAFBaseVisitor<String>
 		currentEnvironment = new Environment(currentEnvironment);
 		String block = visitChildren(ctx);
 		currentEnvironment = environmentsStack.pop();
+
 		return block;
 	}
 
@@ -369,15 +363,22 @@ public class MyVisitor extends DECAFBaseVisitor<String>
 	// [THIS WORDS]
 	public String visitWhileBlockProduction(DECAFParser.WhileBlockProductionContext ctx) {
 		// TODO Auto-generated method stub
+		whileExpression = true; 
+		if(ctx.expression().getChild(1)!= null){
+			operadoresPrimarios.add(ctx.expression().getChild(1).getText());
+		}
 		String bool = visit(ctx.expression());
+		whileExpression = false; 
 		visit(ctx.getChild(4));
 		
 		if(bool.equals("boolean")){
+			whileExpression = false; 
 			return bool;
 		}
 		handleSemanticError("Line: "+ctx.getStart().getLine() 
 				+" While parameter must be a  boolean Expression'" + bool + "'"
 			);
+		whileExpression = false; 
 		return "Error";
 	}
 
@@ -480,6 +481,9 @@ public class MyVisitor extends DECAFBaseVisitor<String>
 		
 		// TODO: Paso número tres, agregar validación para determinar si variable existe
 		//return super.visitDeclaredVariableProduction(ctx);
+		if((ifExpression == true)|| (whileExpression == true)){
+			operandos.add(variableName);
+		}
 		String type = currentEnvironment.getSymbol(variableName, "variable").getType();
 		return type ;
 	}
@@ -527,7 +531,7 @@ public class MyVisitor extends DECAFBaseVisitor<String>
 	@Override
 	public String visitExpressionInP(DECAFParser.ExpressionInPContext ctx) {
 		// TODO Auto-generated method stub
-		return super.visitExpressionInP(ctx);
+		return visit(ctx.expression());
 	}
 
 	@Override
@@ -549,6 +553,8 @@ public class MyVisitor extends DECAFBaseVisitor<String>
 		if(expression.equals(andExpression) &&
 				((expression.equals("boolean"))||(andExpression.equals("boolean")))
 				){
+			//String operador1 = operadorPr
+			//System.out.println("T[N] = ")
 			return expression;
 		}
 		handleSemanticError("Error en la linea: "
@@ -577,13 +583,13 @@ public class MyVisitor extends DECAFBaseVisitor<String>
 	}
 
 	@Override
-	// [THIS WORDS]
 	public String visitAndProduction(DECAFParser.AndProductionContext ctx) {
 		// TODO Auto-generated method stub
 		
 		String andExpression = visit(ctx.getChild(0));
 		String and = visit(ctx.getChild(1));
 		String equalsExpression = visit(ctx.getChild(2));
+		operadoresPrimarios.add(and);
 		if(andExpression.equals(equalsExpression)&&
 				((andExpression.equals("boolean"))||(equalsExpression.equals("boolean")))
 				){
@@ -649,11 +655,19 @@ public class MyVisitor extends DECAFBaseVisitor<String>
 	public String visitRelationProduction(DECAFParser.RelationProductionContext ctx) {
 		// TODO Auto-generated method stub
 		String relationExpression = visit(ctx.getChild(0));
-		String relation = visit(ctx.getChild(1));
+		String relation = (ctx.getChild(1).getText());
 		String additionSubsExpression = visit(ctx.getChild(2));
 		if(relationExpression.equals(additionSubsExpression) &&
 				((relationExpression.equals("int"))||(additionSubsExpression.equals("int")))
 				){
+			System.out.println(operandos);
+			if (whileExpression == true){
+			String operando1 = operandos.get(0);
+			operandos.remove(operando1);
+			String operando2= operandos.get(0);
+			operandos.remove(operando2);
+			System.out.println("T[N] = "+operando1+" "+relation+" "+operando2);
+			String operador = "";}
 			return "boolean";	
 		}
 		handleSemanticError("Error en la linea: "
@@ -800,6 +814,7 @@ public class MyVisitor extends DECAFBaseVisitor<String>
 	public String visitBasic(DECAFParser.BasicContext ctx) {
 		// TODO Auto-generated method stub
 		String type=visitChildren(ctx);
+		
 		return type;
 	}
 
@@ -885,6 +900,7 @@ public class MyVisitor extends DECAFBaseVisitor<String>
 	@Override
 	public String visitRel_op(DECAFParser.Rel_opContext ctx) {
 		// TODO Auto-generated method stub
+		String operador = ctx.getChild(0).getText();
 		return super.visitRel_op(ctx);
 	}
 
@@ -903,6 +919,10 @@ public class MyVisitor extends DECAFBaseVisitor<String>
 	@Override
 	public String visitLiteral(DECAFParser.LiteralContext ctx) {
 		// TODO Auto-generated method stub
+		System.out.println(operandos);
+		if((ifExpression == true)|| (whileExpression == true)){
+			operandos.add(ctx.getChild(0).getChild(0).getText());
+		}
 		String type = visitChildren(ctx);
 		return type;
 	}
