@@ -23,6 +23,8 @@ public class MyVisitor extends DECAFBaseVisitor<String>
 	Stack<Environment> environmentsStack = new Stack<Environment>(); 
 
 	public StringBuffer errors = new StringBuffer("\n Semantic Errors: \n");
+	
+	IntermidiateCodeGenerator generator = new IntermidiateCodeGenerator();
 
 	int n = 0;
 
@@ -37,6 +39,8 @@ public class MyVisitor extends DECAFBaseVisitor<String>
 	
 	boolean ifExpression = false; 
 	boolean whileExpression = false; 
+	boolean arrayOperando = false;
+	String arrayID = "";
 
 	@Override
 	public String visitProgramProduction(DECAFParser.ProgramProductionContext ctx) {
@@ -363,13 +367,77 @@ public class MyVisitor extends DECAFBaseVisitor<String>
 	// [THIS WORDS]
 	public String visitWhileBlockProduction(DECAFParser.WhileBlockProductionContext ctx) {
 		// TODO Auto-generated method stub
+		String startWhileLabel = generator.newWhileLabel();
+		String endWhile = generator.endWhileLabel();
+		appendToCodigoIntermedio(startWhileLabel);
 		whileExpression = true; 
-		if(ctx.expression().getChild(1)!= null){
-			operadoresPrimarios.add(ctx.expression().getChild(1).getText());
-		}
 		String bool = visit(ctx.expression());
-		whileExpression = false; 
+		int temporalesHechas = generator.getTemporarieCount();
+		int lineasNuevas = operadoresPrimarios.size()+1;
+		if(lineasNuevas == 0)
+			lineasNuevas=1;
+		int temporalesAValidar = temporalesHechas - lineasNuevas;
+		String labelTrue = generator.newTrueLabel();
+		String labelFals = "";
+		if (operadoresPrimarios.contains("&&"))
+			 labelFals = generator.newFalseLabel();
+		int contadorOperandos = 0;
+		String prev = "";
+		String next = "";
+		boolean appendNow = false; 
+		for (int i = 0; i<lineasNuevas;i++){
+			String operator = "";
+			if (operadoresPrimarios.size()!= 0){
+				operator = operadoresPrimarios.get(0);
+				prev = operator;
+			}
+			if(contadorOperandos == 2){
+				
+				contadorOperandos = 0;
+				operadoresPrimarios.remove(0);
+			}
+			if (operadoresPrimarios.size()!= 0){
+				operator = operadoresPrimarios.get(0);
+			}
+			next = operator;
+			if (!prev.equals(next)){
+				appendNow = true;
+				if (prev.equals("||")){
+					appendToCodigoIntermedio("\t GOTO "+endWhile);
+				}
+				else if(prev.equals("&&")){
+					appendToCodigoIntermedio("\t GOTO "+labelTrue);
+				}
+				
+			}
+			if(operator.equals("||")|| (operator.equals(""))){
+				appendToCodigoIntermedio("\t IF t"+temporalesAValidar+" > 0 GOTO "+labelTrue);
+				temporalesAValidar++;
+			}
+			if(operator.equals("&&")){
+				appendToCodigoIntermedio("\t IF t"+temporalesAValidar+" = 0 GOTO "+endWhile);
+				temporalesAValidar++;
+			}
+			contadorOperandos++;
+		}
+		if (appendNow == false){
+			if (prev.equals("||")|| (prev.equals(""))){
+				appendToCodigoIntermedio("\t GOTO "+endWhile);
+			}
+			else if(prev.equals("&&")){
+				appendToCodigoIntermedio("\t GOTO "+labelTrue);
+			}
+		}
+		
+		whileExpression = false;
+		System.out.println("Antes: "+operadoresPrimarios);
+		operadoresPrimarios.removeAll(operadoresPrimarios);
+		System.out.println("Despues: "+operadoresPrimarios);
+		
+		appendToCodigoIntermedio(labelTrue+": \n");
+		//Visitar el bloque del while
 		visit(ctx.getChild(4));
+		appendToCodigoIntermedio(endWhile+": \n");
 		
 		if(bool.equals("boolean")){
 			whileExpression = false; 
@@ -378,7 +446,8 @@ public class MyVisitor extends DECAFBaseVisitor<String>
 		handleSemanticError("Line: "+ctx.getStart().getLine() 
 				+" While parameter must be a  boolean Expression'" + bool + "'"
 			);
-		whileExpression = false; 
+		whileExpression = false;
+		
 		return "Error";
 	}
 
@@ -413,10 +482,74 @@ public class MyVisitor extends DECAFBaseVisitor<String>
 	// [THIS WORDS]
 	public String visitIfProduction(DECAFParser.IfProductionContext ctx) {
 		// TODO Auto-generated method stub
+		ifExpression = true; 
 		String bool = visit(ctx.getChild(2));
+		String ifLabel = generator.newIfLabel();
+		int temporalesHechas = generator.getTemporarieCount();
+		int lineasNuevas = operadoresPrimarios.size()+1;
+		if(lineasNuevas == 0)
+			lineasNuevas=1;
+		int temporalesAValidar = temporalesHechas - lineasNuevas;
+		String labelTrue = generator.newTrueLabel();
+		String labelFals = "";
+		if (operadoresPrimarios.contains("&&"))
+			 labelFals = generator.newFalseLabel();
+		int contadorOperandos = 0;
+		String prev = "";
+		String next = "";
+		boolean appendNow = false; 
+		for (int i = 0; i<lineasNuevas;i++){
+			String operator = "";
+			if (operadoresPrimarios.size()!= 0){
+				operator = operadoresPrimarios.get(0);
+				prev = operator;
+			}
+			if(contadorOperandos == 2){
+				
+				contadorOperandos = 0;
+				operadoresPrimarios.remove(0);
+			}
+			if (operadoresPrimarios.size()!= 0){
+				operator = operadoresPrimarios.get(0);
+			}
+			next = operator;
+			if (!prev.equals(next)){
+				appendNow = true;
+				if (prev.equals("||")){
+					appendToCodigoIntermedio("\t GOTO "+ifLabel);
+				}
+				else if(prev.equals("&&")){
+					appendToCodigoIntermedio("\t GOTO "+labelTrue);
+				}
+				
+			}
+			if(operator.equals("||")|| (operator.equals(""))){
+				appendToCodigoIntermedio("\t IF t"+temporalesAValidar+" > 0 GOTO "+labelTrue);
+				temporalesAValidar++;
+			}
+			if(operator.equals("&&")){
+				appendToCodigoIntermedio("\t IF t"+temporalesAValidar+" = 0 GOTO "+ifLabel);
+				temporalesAValidar++;
+			}
+			contadorOperandos++;
+		}
+		if (appendNow == false){
+			if (prev.equals("||")|| (prev.equals(""))){
+				appendToCodigoIntermedio("\t GOTO "+ifLabel);
+			}
+			else if(prev.equals("&&")){
+				appendToCodigoIntermedio("\t GOTO "+labelTrue);
+			}
+		}
+		ifExpression = false;
+		operadoresPrimarios.removeAll(operadoresPrimarios);
 		System.out.println(bool);
+		appendToCodigoIntermedio(labelTrue+": \n");
 		String block = visit(ctx.getChild(4));
-		String elseBlock = visit(ctx.getChild(5));
+		if(ctx.getChild(5)!= null){
+			appendToCodigoIntermedio(ifLabel+": \n");
+			String elseBlock = visit(ctx.getChild(5));
+		}
 		if(bool.equals("boolean")){
 			return bool;
 		}
@@ -484,6 +617,13 @@ public class MyVisitor extends DECAFBaseVisitor<String>
 		if((ifExpression == true)|| (whileExpression == true)){
 			operandos.add(variableName);
 		}
+		if(((ifExpression == true)|| (whileExpression == true)) && (arrayOperando == true)){
+			String temporary = operandos.get(0);
+			operandos.remove(temporary);
+			temporary = arrayID+"["+temporary+"]";
+			operandos.add(0, temporary);;
+		}
+		arrayOperando = false; 
 		String type = currentEnvironment.getSymbol(variableName, "variable").getType();
 		return type ;
 	}
@@ -524,6 +664,10 @@ public class MyVisitor extends DECAFBaseVisitor<String>
 		}
 		// TODO: Paso número tres, agregar validación para determinar si variable existe
 		//return super.visitDeclaredVariableProduction(ctx);
+		if((ifExpression == true)|| (whileExpression == true)){
+			arrayOperando = true;
+			arrayID = variableName;
+		}
 		String type = currentEnvironment.getSymbol(variableName, "variable").getType();
 		return type ;
 	}
@@ -548,8 +692,11 @@ public class MyVisitor extends DECAFBaseVisitor<String>
 	public String visitOrProduction(DECAFParser.OrProductionContext ctx) {
 		// TODO Auto-generated method stub
 		String expression = visit(ctx.getChild(0));
-		String or = visit(ctx.getChild(1));
+		String or = (ctx.getChild(1).getText());
 		String andExpression = visit(ctx.getChild(2));
+		if (or != null){	
+			operadoresPrimarios.add(or);
+		}
 		if(expression.equals(andExpression) &&
 				((expression.equals("boolean"))||(andExpression.equals("boolean")))
 				){
@@ -587,9 +734,11 @@ public class MyVisitor extends DECAFBaseVisitor<String>
 		// TODO Auto-generated method stub
 		
 		String andExpression = visit(ctx.getChild(0));
-		String and = visit(ctx.getChild(1));
+		String and = (ctx.getChild(1).getText());
 		String equalsExpression = visit(ctx.getChild(2));
-		operadoresPrimarios.add(and);
+		if (and != null){	
+			operadoresPrimarios.add(and);
+		}
 		if(andExpression.equals(equalsExpression)&&
 				((andExpression.equals("boolean"))||(equalsExpression.equals("boolean")))
 				){
@@ -661,13 +810,15 @@ public class MyVisitor extends DECAFBaseVisitor<String>
 				((relationExpression.equals("int"))||(additionSubsExpression.equals("int")))
 				){
 			System.out.println(operandos);
-			if (whileExpression == true){
-			String operando1 = operandos.get(0);
-			operandos.remove(operando1);
-			String operando2= operandos.get(0);
-			operandos.remove(operando2);
-			System.out.println("T[N] = "+operando1+" "+relation+" "+operando2);
-			String operador = "";}
+			if (whileExpression == true || ifExpression == true){
+				operador = relation;
+				String operando1 = operandos.get(0);
+				operandos.remove(operando1);
+				String operando2= operandos.get(0);
+				operandos.remove(operando2);
+				appendToCodigoIntermedio("\t"+generator.newTemporary()+operando1+" "+relation+" "+operando2);
+				operador = "";
+			}
 			return "boolean";	
 		}
 		handleSemanticError("Error en la linea: "
