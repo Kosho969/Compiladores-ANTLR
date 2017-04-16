@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
@@ -19,6 +20,11 @@ public class MyVisitor extends DECAFBaseVisitor<String>
 {
 	// We will need here the current environment
 	Environment currentEnvironment = null;
+	ArrayList<String> containedOperations = new ArrayList<String>();
+	List<String> x = new ArrayList<String>(Arrays.asList("+"
+			, "-", "*", "/", "<", ">", "<=", ">=", "=="
+			, "&&", "||", "%", "!="
+			));
 
 	Stack<Environment> environmentsStack = new Stack<Environment>(); 
 
@@ -40,13 +46,19 @@ public class MyVisitor extends DECAFBaseVisitor<String>
 	boolean ifExpression = false; 
 	boolean whileExpression = false; 
 	boolean arrayOperando = false;
+	boolean assignation = false; 
+	boolean isExpression = false; 
+	boolean moreChilds = false; 
+	boolean operandIsArray = false; 
+	boolean operandIsMethod = false; 
+	String currentTemporarie = ""; 
 	String arrayID = "";
 
 	@Override
 	public String visitProgramProduction(DECAFParser.ProgramProductionContext ctx) {
 		String id = ctx.ID().getText();
-
-		System.out.println("Creating new current environment");
+		containedOperations.addAll(x);
+		//System.out.println("Creating new current environment");
 		currentEnvironment = new Environment(null);
 		String result = visitChildren(ctx);
 		MethodSymbol mainOne = (MethodSymbol) currentEnvironment.getSymbol("main", "method");
@@ -188,7 +200,7 @@ public class MyVisitor extends DECAFBaseVisitor<String>
 	public String visitVarType(DECAFParser.VarTypeContext ctx) {
 		// TODO Auto-generated method stub
 		if(ctx.getText().contains("struct")){
-			System.out.println("VarType");
+			//System.out.println("VarType");
 			System.out.println(ctx.ID().getText());
 			return ctx.ID().getText();
 		}
@@ -350,9 +362,49 @@ public class MyVisitor extends DECAFBaseVisitor<String>
 	// [THIS WORDS]
 	public String visitAssignationProduction(DECAFParser.AssignationProductionContext ctx) {
 		// TODO Auto-generated method stub
+		assignation = true; 
+		//System.out.println("Operands: "+operandos);
+		String rightSide = ctx.expression().getText();
+		String ledtSide = ctx.location().getText();
+		System.out.println("Assign: "+ledtSide+" = "+rightSide);
 		String leftType = visit(ctx.location());
+		System.out.println("OperandsBefore right side: "+operandos);
+		
+		
+		for (String operatorChild:containedOperations){
+			if (rightSide.contains(operatorChild)){
+				moreChilds = true; 
+				System.out.println("RightSide: "+rightSide);
+			}
+		}
 		String rightType = visit(ctx.expression());
+		if(moreChilds == false){
+			if (operandIsArray == true){
+				String right = operandos.get(0);
+				appendToCodigoIntermedio("\t"+ledtSide+" = "+right);
+			}
+			else if (operandIsMethod == true){
+				String right = operandos.get(0);
+				appendToCodigoIntermedio("\t"+ledtSide+" = "+right);
+			}
+			else{
+				appendToCodigoIntermedio("\t"+ledtSide+" = "+rightSide);
+			}
+		}
+		else{
+			appendToCodigoIntermedio("\t"+ledtSide+" = "+currentTemporarie);
+		}
+		operadoresPrimarios.removeAll(operadoresPrimarios);
+		operador = "";
+		operandos.removeAll(operandos);
+		operandIsArray = false;
+		operandIsMethod = false; 
+		currentTemporarie = "";
+		moreChilds = false;
+		isExpression = false;
 		if(leftType.equals(rightType)){
+			assignation = false; 
+			
 			return leftType;
 		}
 		else{
@@ -430,10 +482,11 @@ public class MyVisitor extends DECAFBaseVisitor<String>
 		}
 		
 		whileExpression = false;
-		System.out.println("Antes: "+operadoresPrimarios);
-		operadoresPrimarios.removeAll(operadoresPrimarios);
-		System.out.println("Despues: "+operadoresPrimarios);
 		
+		operadoresPrimarios.removeAll(operadoresPrimarios);
+		operador = "";
+		operandos.removeAll(operandos);
+				
 		appendToCodigoIntermedio(labelTrue+": \n");
 		//Visitar el bloque del while
 		visit(ctx.getChild(4));
@@ -454,7 +507,7 @@ public class MyVisitor extends DECAFBaseVisitor<String>
 	@Override
 	// [THIS WORDS]
 	public String visitReturnBlockProduction(DECAFParser.ReturnBlockProductionContext ctx, String test) {
-		System.out.println("Visitando return con: " + test);
+		//System.out.println("Visitando return con: " + test);
 		
 		// TODO: Comparar el resultado de super.visitReturnBlockProduction(ctx, test);
 		// contra methodSymbol.type.
@@ -543,7 +596,9 @@ public class MyVisitor extends DECAFBaseVisitor<String>
 		}
 		ifExpression = false;
 		operadoresPrimarios.removeAll(operadoresPrimarios);
-		System.out.println(bool);
+		operador = "";
+		operandos.removeAll(operandos);
+		//System.out.println(bool);
 		appendToCodigoIntermedio(labelTrue+": \n");
 		String block = visit(ctx.getChild(4));
 		if(ctx.getChild(5)!= null){
@@ -569,13 +624,13 @@ public class MyVisitor extends DECAFBaseVisitor<String>
 	public String visitDotLocation(DECAFParser.DotLocationContext ctx) {
 		// TODO Auto-generated method stub
 		currentEnvironment.print();
-		System.out.println("dotLocation");
+		//System.out.println("dotLocation");
 		String typeLeft = visit(ctx.variable());
 		String typeRight = visit(ctx.location());
 		if(currentEnvironment.hasSymbol(typeLeft, "struct")){
-			System.out.println("STRUCTS");
-			System.out.println(typeLeft);
-			System.out.println(currentEnvironment.getSymbol(typeLeft,"struct" ));
+			//System.out.println("STRUCTS");
+			//System.out.println(typeLeft);
+			//System.out.println(currentEnvironment.getSymbol(typeLeft,"struct" ));
 			if(typeLeft.equals(typeRight)){
 				System.out.println("STRUCTS");
 				System.out.println(typeRight);
@@ -615,9 +670,27 @@ public class MyVisitor extends DECAFBaseVisitor<String>
 		// TODO: Paso número tres, agregar validación para determinar si variable existe
 		//return super.visitDeclaredVariableProduction(ctx);
 		if((ifExpression == true)|| (whileExpression == true)){
-			operandos.add(variableName);
+				operandos.add(variableName);
+			
+			
+		}
+		if(isExpression == true && moreChilds == true){
+			System.out.println("In");
+			if (currentTemporarie.equals("")){
+				operandos.add(variableName);
+			}
+			else{
+				operandos.add(0,currentTemporarie);
+			}
+			System.out.println("Operands inside expr: "+operandos);
 		}
 		if(((ifExpression == true)|| (whileExpression == true)) && (arrayOperando == true)){
+			String temporary = operandos.get(0);
+			operandos.remove(temporary);
+			temporary = arrayID+"["+temporary+"]";
+			operandos.add(0, temporary);;
+		}
+		if(isExpression == true && moreChilds == true && (arrayOperando == true)){
 			String temporary = operandos.get(0);
 			operandos.remove(temporary);
 			temporary = arrayID+"["+temporary+"]";
@@ -665,6 +738,10 @@ public class MyVisitor extends DECAFBaseVisitor<String>
 		// TODO: Paso número tres, agregar validación para determinar si variable existe
 		//return super.visitDeclaredVariableProduction(ctx);
 		if((ifExpression == true)|| (whileExpression == true)){
+			arrayOperando = true;
+			arrayID = variableName;
+		}
+		if (isExpression == true){
 			arrayOperando = true;
 			arrayID = variableName;
 		}
@@ -717,6 +794,7 @@ public class MyVisitor extends DECAFBaseVisitor<String>
 	// [THIS WORDS]
 	public String visitAndExpr(DECAFParser.AndExprContext ctx) {
 		// TODO Auto-generated method stub
+		isExpression = true; 
 		String andExpression = visitChildren(ctx);
 		return andExpression;
 	}
@@ -809,7 +887,7 @@ public class MyVisitor extends DECAFBaseVisitor<String>
 		if(relationExpression.equals(additionSubsExpression) &&
 				((relationExpression.equals("int"))||(additionSubsExpression.equals("int")))
 				){
-			System.out.println(operandos);
+			//System.out.println(operandos);
 			if (whileExpression == true || ifExpression == true){
 				operador = relation;
 				String operando1 = operandos.get(0);
@@ -837,10 +915,38 @@ public class MyVisitor extends DECAFBaseVisitor<String>
 		String additionSubsExpression = visit(ctx.getChild(0));
 		String arithmetic = visit(ctx.getChild(1));
 		String multDivExpression = visit(ctx.getChild(2));
+		String basicLeft = ctx.getChild(0).getText();
+		String op = ctx.getChild(1).getText();
+		String basicRight = ctx.getChild(2).getText();
 		if(additionSubsExpression.equals(multDivExpression)&&
 				((multDivExpression.equals("int"))||(additionSubsExpression.equals("int")))
 				){
-			
+			if(currentTemporarie.equals("")){
+				if (isExpression == true){
+					System.out.println("Operands inside add: "+operandos);
+					operador = op;
+					String operando1 = operandos.get(0);
+					operandos.remove(operando1);
+					String operando2= operandos.get(0);
+					operandos.remove(operando2);
+					appendToCodigoIntermedio("\t"+generator.newTemporary()+operando1+" "+op+" "+operando2);
+					currentTemporarie = "T"+(generator.getTemporarieCount()-1);
+					operador = "";
+				}
+			}
+			else{
+				if (isExpression == true){
+					System.out.println("Operands inside add_subs: "+operandos);
+					operador = op;
+					String operando1 = operandos.get(0);
+					operandos.remove(operando1);
+					String operando2= operandos.get(0);
+					operandos.remove(operando2);
+					appendToCodigoIntermedio("\t"+generator.newTemporary()+currentTemporarie+" "+op+" "+operando2);
+					currentTemporarie = "T"+(generator.getTemporarieCount()-1);
+					operador = "";
+				}
+			}
 			return additionSubsExpression;
 		}
 		handleSemanticError("Error en la linea: "
@@ -1027,6 +1133,13 @@ public class MyVisitor extends DECAFBaseVisitor<String>
 		// TODO: Paso número tres, agregar validación para determinar si variable existe
 		//return super.visitDeclaredVariableProduction(ctx);
 		String type = currentEnvironment.getSymbol(variableName, "method").getType();
+		if(isExpression ==true){
+			operandIsMethod = true;
+			appendToCodigoIntermedio("\tCALL "+variableName);
+			appendToCodigoIntermedio("\t"+generator.newTemporary()+"R");
+			operandos.add("T"+(generator.getTemporarieCount()-1));
+			System.out.println(operandos);
+		}
 		return type ;
 	}
 
@@ -1071,7 +1184,10 @@ public class MyVisitor extends DECAFBaseVisitor<String>
 	public String visitLiteral(DECAFParser.LiteralContext ctx) {
 		// TODO Auto-generated method stub
 		System.out.println(operandos);
-		if((ifExpression == true)|| (whileExpression == true)){
+		if(!currentTemporarie.equals("")){
+			operandos.add(currentTemporarie);
+		}
+		if((ifExpression == true)|| (whileExpression == true)|| (isExpression == true)){
 			operandos.add(ctx.getChild(0).getChild(0).getText());
 		}
 		String type = visitChildren(ctx);
