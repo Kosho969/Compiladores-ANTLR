@@ -56,6 +56,7 @@ public class MyVisitor extends DECAFBaseVisitor<String>
 	String leftLocation = "";
 	String currentTemporarie = ""; 
 	String arrayID = "";
+	String newLeftSide = ""; 
 
 	@Override
 	public String visitProgramProduction(DECAFParser.ProgramProductionContext ctx) {
@@ -365,13 +366,17 @@ public class MyVisitor extends DECAFBaseVisitor<String>
 	// [THIS WORDS]
 	public String visitAssignationProduction(DECAFParser.AssignationProductionContext ctx) {
 		// TODO Auto-generated method stub
-		
+		operandos.removeAll(operandos);
 		//System.out.println("Operands: "+operandos);
+		assignation = true; 
 		String rightSide = ctx.expression().getText();
 		String ledtSide = ctx.location().getText();
 		System.out.println("Assign: "+ledtSide+" = "+rightSide);
 		String leftType = visit(ctx.location());
-		assignation = true; 
+		operandos.removeAll(operandos);
+		location = false; 
+		assignation = true;  
+		newLeftSide = "";
 		System.out.println("OperandsBefore right side: "+operandos);
 		
 		
@@ -380,6 +385,9 @@ public class MyVisitor extends DECAFBaseVisitor<String>
 				moreChilds = true; 
 				System.out.println("RightSide: "+rightSide);
 			}
+		}
+		if (!leftLocation.equals("")){
+			ledtSide = leftLocation;
 		}
 		String rightType = visit(ctx.expression());
 		if(moreChilds == false){
@@ -406,6 +414,9 @@ public class MyVisitor extends DECAFBaseVisitor<String>
 		currentTemporarie = "";
 		moreChilds = false;
 		isExpression = false;
+		leftLocation = "";
+		currentTemporarie = "";
+		
 		if(leftType.equals(rightType)){
 			assignation = false; 
 			
@@ -621,6 +632,9 @@ public class MyVisitor extends DECAFBaseVisitor<String>
 	@Override
 	public String visitLocation(DECAFParser.LocationContext ctx) {
 		// TODO Auto-generated method stub
+		if (assignation == true){
+		location = true; 
+		}
 		return super.visitLocation(ctx);
 	}
 
@@ -679,7 +693,7 @@ public class MyVisitor extends DECAFBaseVisitor<String>
 			
 			
 		}
-		else if(isExpression == true /*&& moreChilds == true*/ ){
+		else if(isExpression == true ){
 			//System.out.println("In");
 			if (currentTemporarie.equals("")){
 				operandos.add(variableName);
@@ -688,6 +702,10 @@ public class MyVisitor extends DECAFBaseVisitor<String>
 				operandos.add(0,currentTemporarie);
 			}
 			System.out.println("Operands inside expr: "+operandos);
+		}
+		else if(location == true && arrayOperando == true && isExpression == false){
+			//System.out.println("In");
+			newLeftSide = variableName;
 		}
 		if(((ifExpression == true)|| (whileExpression == true)) && (arrayOperando == true)){
 			//System.out.println("In4");
@@ -709,16 +727,24 @@ public class MyVisitor extends DECAFBaseVisitor<String>
 			operandos.add(0, temporary);
 		}
 		else if(isExpression == true && moreChilds == false && (arrayOperando == true)){
-			//System.out.println("In3");
+			System.out.println("In3");
 			String temporary = operandos.get(0);
 			operandos.remove(temporary);
 			//temporary = arrayID+"["+temporary+"]";
 			appendToCodigoIntermedio("\t"+generator.newTemporary()+temporary+" * "+arrayID+"[]");
 			temporary = "T"+(generator.getTemporarieCount()-1);
 			operandos.add(0, temporary);
-		}
-		if(location == true){
+			leftLocation = temporary;
 			
+		}
+		else if(location == true && isExpression == true && assignation == true && arrayOperando == true){
+			System.out.println("LocationArray");
+			String temporary = newLeftSide;
+			//operandos.remove(temporary);
+			//temporary = arrayID+"["+temporary+"]";
+			appendToCodigoIntermedio("\t"+generator.newTemporary()+temporary+" * "+arrayID+"[]");
+			temporary = "T"+(generator.getTemporarieCount()-1);
+			leftLocation = temporary;
 		}
 		String type = currentEnvironment.getSymbol(variableName, "variable").getType();
 		return type ;
@@ -754,7 +780,7 @@ public class MyVisitor extends DECAFBaseVisitor<String>
 			arrayOperando = true;
 			arrayID = variableName;
 		}
-		if (isExpression == true){
+		if (isExpression == true || location == true){
 			arrayOperando = true;
 			operandIsArray = true;
 			arrayID = variableName;
@@ -1217,7 +1243,7 @@ public class MyVisitor extends DECAFBaseVisitor<String>
 			operandos.add(currentTemporarie);
 		}
 		if((ifExpression == true)|| (whileExpression == true)|| (isExpression == true)){
-			operandos.add(0,ctx.getChild(0).getChild(0).getText());
+			operandos.add(ctx.getChild(0).getChild(0).getText());
 		}
 		if(((ifExpression == true)|| (whileExpression == true)) && (arrayOperando == true)){
 			//System.out.println("In4");
