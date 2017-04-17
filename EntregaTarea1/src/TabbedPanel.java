@@ -128,8 +128,8 @@ class TabbedPanel extends JFrame
         // De no poner esto, hace un arbol justo a la par
         treePanel.removeAll();
         treePanel.add(treeViewer);
-        MyVisitor visitor = new MyVisitor();
-		visitor.visit(tree);
+        MyVisitor2 visitor2 = new MyVisitor2();
+		visitor2.visit(tree);
 
         
 
@@ -146,16 +146,18 @@ class TabbedPanel extends JFrame
             for (int i = 0; i < errors.size(); i++) {
                 areaError.append("(" + (i + 1) + "): " + errors.get(i) + "\n");
             }
-            areaError.append(visitor.errors.toString());
+            areaError.append(visitor2.errors.toString());
 
             return 1;
         } catch ( IOException e ) {
             areaError.setText("No syntactic errors \n ");
-            areaError.append(visitor.errors.toString());
+            areaError.append(visitor2.errors.toString());
 
             // Testear si no hay errores de ninguna naturaleza, y si no hay
             // hacer output de código intermedio
-            if (visitor.n == 0) {
+            if (visitor2.n == 0) {
+            	 MyVisitor visitor = new MyVisitor();
+         		visitor.visit(tree);
             	generarArhivoCodigoIntermedio(
         			visitor.getCodigoIntermedioArrayList()
     			);
