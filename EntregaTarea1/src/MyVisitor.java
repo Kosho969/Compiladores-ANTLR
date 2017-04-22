@@ -39,6 +39,7 @@ public class MyVisitor extends DECAFBaseVisitor<String>
 	ArrayList<String> operadoresPrimarios = new ArrayList<String>();
 	ArrayList<String> operandos = new ArrayList<String>();
 	ArrayList<String> params = new ArrayList<String>();
+	ArrayList<String> arguments = new ArrayList<String>();
 	String operador = "";
 	
 	ArrayList<String> codigoIntermedioArrayList = new ArrayList<String>();
@@ -53,6 +54,7 @@ public class MyVisitor extends DECAFBaseVisitor<String>
 	boolean operandIsArray = false; 
 	boolean operandIsMethod = false; 
 	boolean location = false; 
+	boolean argument = false;
 	String leftLocation = "";
 	String currentTemporarie = ""; 
 	String arrayID = "";
@@ -264,17 +266,18 @@ public class MyVisitor extends DECAFBaseVisitor<String>
         }
 
         visit(ctx.RPARENT());
-
+        MethodSymbol currentSymbol = new MethodSymbol(
+    			symbolType,
+    			identifier,
+    			false,
+    			firm
+    		);
+        currentEnvironment.putSymbol("method", identifier, currentSymbol);
 		String result = visit(ctx.block());
 
 		currentEnvironment = environmentsStack.pop();
 		
-		MethodSymbol currentSymbol = new MethodSymbol(
-			symbolType,
-			identifier,
-			false,
-			firm
-		);
+		
 		
 		currentEnvironment.putSymbol("method", identifier, currentSymbol);
 		
@@ -367,7 +370,7 @@ public class MyVisitor extends DECAFBaseVisitor<String>
 	public String visitAssignationProduction(DECAFParser.AssignationProductionContext ctx) {
 		// TODO Auto-generated method stub
 		operandos.removeAll(operandos);
-		//System.out.println("Operands: "+operandos);
+		System.out.println("Inside Assign ");
 		assignation = true; 
 		String rightSide = ctx.expression().getText();
 		String ledtSide = ctx.location().getText();
@@ -436,7 +439,7 @@ public class MyVisitor extends DECAFBaseVisitor<String>
 		// TODO Auto-generated method stub
 		String startWhileLabel = generator.newWhileLabel();
 		String endWhile = generator.endWhileLabel();
-		appendToCodigoIntermedio(startWhileLabel);
+		appendToCodigoIntermedio(startWhileLabel+":");
 		whileExpression = true; 
 		String bool = visit(ctx.expression());
 		int temporalesHechas = generator.getTemporarieCount();
@@ -505,6 +508,7 @@ public class MyVisitor extends DECAFBaseVisitor<String>
 		appendToCodigoIntermedio(labelTrue+": \n");
 		//Visitar el bloque del while
 		visit(ctx.getChild(4));
+		appendToCodigoIntermedio("\tGOTO "+startWhileLabel);
 		appendToCodigoIntermedio(endWhile+": \n");
 		
 		if(bool.equals("boolean")){
@@ -616,9 +620,10 @@ public class MyVisitor extends DECAFBaseVisitor<String>
 		//System.out.println(bool);
 		appendToCodigoIntermedio(labelTrue+": \n");
 		String block = visit(ctx.getChild(4));
-		if(ctx.getChild(5)!= null){
+		if(ctx.getChild(5).getText().equals("else")){
 			appendToCodigoIntermedio(ifLabel+": \n");
-			String elseBlock = visit(ctx.getChild(5));
+			System.out.println("Else block: "+ctx.getChild(6).getText());
+			String elseBlock = visit(ctx.getChild(6));
 		}
 		if(bool.equals("boolean")){
 			return bool;
@@ -689,14 +694,14 @@ public class MyVisitor extends DECAFBaseVisitor<String>
 		//return super.visitDeclaredVariableProduction(ctx);
 		if((ifExpression == true)|| (whileExpression == true)){
 				
-			operandos.add(variableName);
+			operandos.add(0,variableName);
 			
 			
 		}
 		else if(isExpression == true ){
 			//System.out.println("In");
 			if (currentTemporarie.equals("")){
-				operandos.add(variableName);
+				operandos.add(0,variableName);
 			}
 			else{
 				operandos.add(0,currentTemporarie);
@@ -848,7 +853,7 @@ public class MyVisitor extends DECAFBaseVisitor<String>
 	public String visitAndExpr(DECAFParser.AndExprContext ctx) {
 		// TODO Auto-generated method stub
 		
-		if (assignation == true){
+		if (assignation == true || argument){
 			isExpression = true; 
 		}
 		String andExpression = visitChildren(ctx);
@@ -950,7 +955,7 @@ public class MyVisitor extends DECAFBaseVisitor<String>
 				operandos.remove(operando1);
 				String operando2= operandos.get(0);
 				operandos.remove(operando2);
-				appendToCodigoIntermedio("\t"+generator.newTemporary()+operando1+" "+relation+" "+operando2);
+				appendToCodigoIntermedio("\t"+generator.newTemporary()+operando2+" "+relation+" "+operando1);
 				operador = "";
 			}
 			return "boolean";	
@@ -974,18 +979,20 @@ public class MyVisitor extends DECAFBaseVisitor<String>
 		String basicLeft = ctx.getChild(0).getText();
 		String op = ctx.getChild(1).getText();
 		String basicRight = ctx.getChild(2).getText();
-		if(additionSubsExpression.equals(multDivExpression)&&
-				((multDivExpression.equals("int"))||(additionSubsExpression.equals("int")))
-				){
+		//if(additionSubsExpression.equals(multDivExpression)&&
+			//	((multDivExpression.equals("int"))||(additionSubsExpression.equals("int")))
+				//){
 			if(currentTemporarie.equals("")){
 				if (isExpression == true){
 					System.out.println("Operands inside add: "+operandos);
+					System.out.println("left: "+basicLeft);
+					System.out.println("right: "+basicRight);
 					operador = op;
 					String operando1 = operandos.get(0);
 					operandos.remove(operando1);
 					String operando2= operandos.get(0);
 					operandos.remove(operando2);
-					appendToCodigoIntermedio("\t"+generator.newTemporary()+operando1+" "+op+" "+operando2);
+					appendToCodigoIntermedio("\t"+generator.newTemporary()+operando2+" "+op+" "+operando1);
 					currentTemporarie = "T"+(generator.getTemporarieCount()-1);
 					operador = "";
 				}
@@ -1005,14 +1012,13 @@ public class MyVisitor extends DECAFBaseVisitor<String>
 			}
 			return additionSubsExpression;
 		}
-		handleSemanticError("Error en la linea: "
-				+ ctx.getStart().getLine()
-				+ "\n "
-				+ "Expecter type integer"
-			);
-		System.out.println("Error Expected Type INTEGER at line: "+ctx.getStart().getLine());
-		return "Error";
-	}
+		//handleSemanticError("Error en la linea: "
+				//+ ctx.getStart().getLine()
+				//+ "\n "
+				//+ "Expecter type integer"
+			//);
+		//System.out.println("Error Expected Type INTEGER at line: "+ctx.getStart().getLine());
+	
 
 	@Override
 	// [THIS WORDS]
@@ -1134,7 +1140,14 @@ public class MyVisitor extends DECAFBaseVisitor<String>
 	@Override
 	public String visitArg(DECAFParser.ArgContext ctx) {
 		// TODO Auto-generated method stub
+		if(operandIsMethod == true){
+			argument = true;
+		}
 		String type = visitChildren(ctx);
+		if(!currentTemporarie.equals("")){
+			arguments.add(currentTemporarie);
+			currentTemporarie = "";
+		}
 		return type;
 	}
 
@@ -1142,8 +1155,8 @@ public class MyVisitor extends DECAFBaseVisitor<String>
 	public String visitMethodCallProduction(DECAFParser.MethodCallProductionContext ctx) {
 		// TODO Auto-generated method stub
 		String variableName = ctx.ID().getText();
-		//currentEnvironment.print();
-
+		System.out.println("METHOD CALLING"+isExpression);
+		
 		if (!currentEnvironment.hasSymbol(variableName, "method"))
 		{
 			handleSemanticError("Error en la linea: "
@@ -1153,10 +1166,32 @@ public class MyVisitor extends DECAFBaseVisitor<String>
 			);
 			return "Error";
 		}
+		
 		MethodSymbol currentMethod = (MethodSymbol)currentEnvironment.getSymbol(variableName, "method");
 		ArrayList<String> typesInArguments = new ArrayList<String>();
-		for(DECAFParser.ArgContext argument:ctx.arg()){
-			typesInArguments.add(visit(argument));
+		
+		MethodSymbol method = (MethodSymbol) currentEnvironment.getSymbol(variableName, "method");
+		if(isExpression ==true){
+			System.out.println("METHOD CALLING");
+			operandIsMethod = true;
+			for(DECAFParser.ArgContext argument:ctx.arg()){
+				typesInArguments.add(visit(argument));
+			}
+			if (method.getFirm().isEmpty()){
+				appendToCodigoIntermedio("\tCALL "+variableName);
+				appendToCodigoIntermedio("\t"+generator.newTemporary()+"R");
+			}
+			else{
+				appendToCodigoIntermedio("\tCALL "+variableName+", "+method.getFirm().size());
+				String firma = "";
+				for (int i = 0; i< method.getFirm().size(); i++){
+					firma = firma+method.getFirm().get(i).getName()+" , ";
+				}
+				appendToCodigoIntermedio("\t PARAMS: "+firma);
+				appendToCodigoIntermedio("\t"+generator.newTemporary()+"R");
+			}
+			operandos.add(0,"T"+(generator.getTemporarieCount()-1));
+			
 		}
 		if(typesInArguments.size() != currentMethod.getFirm().size()){
 			handleSemanticError("Error en la linea: "
@@ -1166,6 +1201,8 @@ public class MyVisitor extends DECAFBaseVisitor<String>
 				);
 			return "Error";
 		}
+		String type = currentEnvironment.getSymbol(variableName, "method").getType();
+		
 		ArrayList<String> parameterTypes = new ArrayList<String>();
 		for(int i=0; i<  currentMethod.getFirm().size();i++){
 			VariableSymbol symbol = (VariableSymbol)currentMethod.getFirm().get(i);
@@ -1188,14 +1225,7 @@ public class MyVisitor extends DECAFBaseVisitor<String>
 		}
 		// TODO: Paso número tres, agregar validación para determinar si variable existe
 		//return super.visitDeclaredVariableProduction(ctx);
-		String type = currentEnvironment.getSymbol(variableName, "method").getType();
-		if(isExpression ==true){
-			operandIsMethod = true;
-			appendToCodigoIntermedio("\tCALL "+variableName);
-			appendToCodigoIntermedio("\t"+generator.newTemporary()+"R");
-			operandos.add(0,"T"+(generator.getTemporarieCount()-1));
-			System.out.println(operandos);
-		}
+		
 		return type ;
 	}
 
@@ -1239,11 +1269,12 @@ public class MyVisitor extends DECAFBaseVisitor<String>
 	@Override
 	public String visitLiteral(DECAFParser.LiteralContext ctx) {
 		// TODO Auto-generated method stub
+		System.out.println("Operands Literal: "+operandos);
 		if(!currentTemporarie.equals("")){
-			operandos.add(currentTemporarie);
+			operandos.add(0, currentTemporarie);
 		}
-		if((ifExpression == true)|| (whileExpression == true)|| (isExpression == true)){
-			operandos.add(ctx.getChild(0).getChild(0).getText());
+		else if((ifExpression == true)|| (whileExpression == true)|| (isExpression == true)){
+			operandos.add(0, ctx.getChild(0).getChild(0).getText());
 		}
 		if(((ifExpression == true)|| (whileExpression == true)) && (arrayOperando == true)){
 			//System.out.println("In4");
@@ -1254,7 +1285,7 @@ public class MyVisitor extends DECAFBaseVisitor<String>
 			temporary = "T"+(generator.getTemporarieCount()-1);
 			operandos.add(0, temporary);
 		}
-		if(isExpression == true && moreChilds == true && (arrayOperando == true)){
+		else if(isExpression == true && moreChilds == true && (arrayOperando == true)){
 			//System.out.println("In3");
 			String temporary = operandos.get(0);
 			operandos.remove(temporary);
@@ -1263,6 +1294,18 @@ public class MyVisitor extends DECAFBaseVisitor<String>
 			temporary = "T"+(generator.getTemporarieCount()-1);
 			operandos.add(0, temporary);
 		}
+		else if(isExpression == true && moreChilds == false && (arrayOperando == true)){
+			//System.out.println("In3");
+			String temporary = operandos.get(0);
+			operandos.remove(temporary);
+			//temporary = arrayID+"["+temporary+"]";
+			appendToCodigoIntermedio("\t"+generator.newTemporary()+temporary+" * "+arrayID+"[]");
+			temporary = "T"+(generator.getTemporarieCount()-1);
+			operandos.add(0, temporary);
+			leftLocation = temporary;
+			
+		}
+		System.out.println("Operands Literal2: "+operandos);
 		String type = visitChildren(ctx);
 		return type;
 	}
