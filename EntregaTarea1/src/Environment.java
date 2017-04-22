@@ -4,16 +4,17 @@ import java.util.ArrayList;
 public class Environment {
 
 	Environment parent;
-	
-	int currentOffset;
 
 	ArrayList<TableEntry> symbolTable = new ArrayList<TableEntry>();
+	
+	boolean isMethodEnvironment = false;
+	
+	boolean isClassEnvironment = false;
+	
+	int currentVariablesOffset = 0;
 
 	public Environment(Environment parent) {
 		this.parent = parent;
-		this.currentOffset = 0;
-
-		this.symbolTable = new ArrayList<TableEntry>();
 	}
 
 	public Environment getParent() {
@@ -32,19 +33,53 @@ public class Environment {
 	{
 		this.symbolTable = symbolTable;
 	}
-	
+
 	public void putSymbol(String type, String lexema, Symbol s)
 	{
-		TableEntry entry = new TableEntry(type, lexema, s);
+		TableEntry entry = new TableEntry(type, lexema, s, this);
 
 		// Si el entry que estoy agregando es de tipo variable,
 		// analizar el tipo de variable, asignarle el offset y hacer
 		// el corrimiento de offset actual respectivo
 		if ("variable" == type) {
-			
+			((VariableSymbol) s).setEntryVariableOffset(
+				this.getAndUpdateCurrentVariableOffsetForType(type)
+			);
 		}
 		
 		this.symbolTable.add(entry);
+	}
+	
+	public int getAndUpdateCurrentVariableOffsetForType(String type) {
+		// TODO: Analizar la variable type para calcular la cantidad
+		// a sumar en el offset. Si el actual es int, sumar 4. Si el tipo
+		// es array, sumar el tamaño del array, si el tipo es boolean,
+		// sumar uno, etc.
+		int offsetToSum = 4;
+
+		if (this.isClassEnvironment) {
+			int returnValue = this.currentVariablesOffset;
+			this.currentVariablesOffset += offsetToSum;
+			return returnValue;
+		}
+
+		Environment methodEnvironment = this.getClosestMethodEnvironment();
+		int returnValue = methodEnvironment.currentVariablesOffset;
+		methodEnvironment.currentVariablesOffset += offsetToSum;
+
+		return returnValue;
+	}
+	
+	public Environment getClosestMethodEnvironment() {
+		if (this.isMethodEnvironment) {
+			return this;
+		}
+		
+		if (null != this.getParent()) {
+			return this.getParent().getClosestMethodEnvironment();
+		}
+
+		return this;
 	}
 	
 	public Symbol getSymbol(String name, String type)
@@ -69,6 +104,7 @@ public class Environment {
 
 		return null;
 	}
+
 	public Symbol getSymbol2(String name, String type)
 	{
 		for (int i = 0; i < symbolTable.size(); i++) {
@@ -81,6 +117,7 @@ public class Environment {
 				return currentTableEntry.getValue();
 			}
 		}
+
 		return null;
 	}
 	
@@ -88,6 +125,7 @@ public class Environment {
 	{
 		return null != getSymbol(name, type);
 	}
+
 	public boolean hasSymbol2(String name, String type)
 	{
 		return null != getSymbol2(name, type);

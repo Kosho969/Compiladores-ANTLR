@@ -1,5 +1,8 @@
 
 public class TableEntry {
+
+	Environment environment;
+
 	// Identificadores 
 	String lexem;
 
@@ -8,13 +11,15 @@ public class TableEntry {
 
 	// Symbol that goes into the Symbol Table 
 	Symbol value;
-	
+
 	int size = 0;
 	
-	public TableEntry(String type, String lexem, Symbol value) {
+	public TableEntry(String type, String lexem, Symbol value, Environment environment) {
 		this.lexem = lexem;
 		this.type = type;
 		this.value = value;
+		this.environment = environment;
+		value.tableEntry = this;
 	}
 	
 	public TableEntry(String type, String lexem, Symbol value, int size) {
@@ -23,10 +28,7 @@ public class TableEntry {
 		this.value = value;
 		this.size = size; 
 	}
-	
-	/**
-	 * TODO: Evaluar si lo necesitamos
-	 */
+
 	public TableEntry() {
 		this.lexem = "";
 		this.type = "";
@@ -56,5 +58,4 @@ public class TableEntry {
 	public void setValue(Symbol value) {
 		this.value = value;
 	}
-	
 }

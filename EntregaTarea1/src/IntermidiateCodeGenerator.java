@@ -29,6 +29,7 @@ public class IntermidiateCodeGenerator {
 	public String newTrueLabel(){
 		String label = "Label_True"+trueLabel+"";
 		trueLabel++;
+
 		return label;
 	}
 	
@@ -46,15 +47,16 @@ public class IntermidiateCodeGenerator {
 	public int getTemporarieCount() {
 		return temporarieCount;
 	}
+
 	public void setTemporarieCount(int temporarieCount) {
 		this.temporarieCount = temporarieCount;
 	}
+
 	public int getWhileLabelCount() {
 		return whileLabelCount;
 	}
+
 	public void setWhileLabelCount(int whileLabelCount) {
 		this.whileLabelCount = whileLabelCount;
 	}
-	
-
 }

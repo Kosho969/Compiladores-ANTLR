@@ -15,6 +15,8 @@ public class Symbol
 
 	boolean isStruct;
 	
+	public TableEntry tableEntry;
+	
 	/**
 	 * TODO: Revisar si necestiamos
 	 */

@@ -128,15 +128,13 @@ class TabbedPanel extends JFrame
         // De no poner esto, hace un arbol justo a la par
         treePanel.removeAll();
         treePanel.add(treeViewer);
+
+        // Este es el visitador del análisis semántico
         MyVisitor2 visitor2 = new MyVisitor2();
 		visitor2.visit(tree);
 
-        
+		// TODO: Agregar pane para output de código intermedio
 
-        
-        
-        // TODO: Agregar pane para output de código intermedio
-        
         // Read and write errors.
         try {
             areaError.setText("");
@@ -156,13 +154,16 @@ class TabbedPanel extends JFrame
             // Testear si no hay errores de ninguna naturaleza, y si no hay
             // hacer output de código intermedio
             if (visitor2.n == 0) {
-            	 MyVisitor visitor = new MyVisitor();
+            	// Este es el visitador de generación de código intermedio
+            	MyVisitor visitor = new MyVisitor();
+
          		visitor.visit(tree);
+
             	generarArhivoCodigoIntermedio(
         			visitor.getCodigoIntermedioArrayList()
     			);
             }
-            
+
             return 1;
         }
     }
