@@ -280,9 +280,9 @@ public class MyVisitor extends DECAFBaseVisitor<String>
         String leftType = visit(ctx.location());
         
         // TODO: Considerar acceso por el lado izquierdo a variables de estructuras o de arrays
-        VariableSymbol variableSymbol = (VariableSymbol) currentEnvironment.getSymbol(leftSide, "variable");
-        leftSide = variableSymbol.getIntermediateName();
-
+        
+        leftSide = operandos.get(0);
+        System.out.println("LeftSide: "+operandos);
         operandos.removeAll(operandos);
 
         location = false; 
@@ -311,7 +311,8 @@ public class MyVisitor extends DECAFBaseVisitor<String>
                 appendToCodigoIntermedio(leftSide+" = "+right);
             }
             else{
-                appendToCodigoIntermedio(leftSide+" = "+rightSide);
+            	String right = operandos.get(0);
+                appendToCodigoIntermedio(leftSide+" = "+right);
             }
         } else{
             appendToCodigoIntermedio(leftSide+" = "+currentTemporarie);
@@ -586,7 +587,7 @@ public class MyVisitor extends DECAFBaseVisitor<String>
         VariableSymbol symbol = (VariableSymbol) currentEnvironment.getSymbol(variableName, "variable");
         variableName = symbol.getIntermediateName();
 
-        if((ifExpression == true)|| (whileExpression == true)){
+        if((ifExpression == true)|| (whileExpression == true)|| location == true){
             operandos.add(0, variableName);
         } else if(isExpression == true ){
             if (currentTemporarie.equals("")){

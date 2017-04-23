@@ -14,7 +14,7 @@ public class antlrIDE
 		// TODO: Remove this stuff
 		try {
 			// TODO: Agregar for para testear todas las pruebas dentro de la carpeta "tests"
-			panel.areaTest.setText(antlrIDE.readFile("tests/CI-1.txt"));
+			panel.areaTest.setText(antlrIDE.readFile("fibo.txt"));
 			panel.tabbedPane.setSelectedIndex(2);
 
 			// If success, exit
