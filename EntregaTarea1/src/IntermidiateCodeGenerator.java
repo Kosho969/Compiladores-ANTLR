@@ -16,7 +16,7 @@ public class IntermidiateCodeGenerator {
 	}
 	
 	public String newWhileLabel(){
-		String whileLabel = "Start_While"+whileLabelCount+"\n";
+		String whileLabel = "Start_While"+whileLabelCount+"";
 		return whileLabel;
 	}
 	

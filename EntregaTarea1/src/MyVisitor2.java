@@ -404,7 +404,10 @@ public class MyVisitor2 extends DECAFBaseVisitor<String>
 		String bool = visit(ctx.getChild(2));
 		System.out.println(bool);
 		String block = visit(ctx.getChild(4));
-		String elseBlock = visit(ctx.getChild(5));
+		if (ctx.getChild(5)!= null){
+
+            String elseBlock = visit(ctx.getChild(6));
+        }
 		if(bool != null){
 		if(bool.equals("boolean")){
 			return bool;
@@ -523,7 +526,8 @@ public class MyVisitor2 extends DECAFBaseVisitor<String>
 	@Override
 	public String visitExpressionInP(DECAFParser.ExpressionInPContext ctx) {
 		// TODO Auto-generated method stub
-		return super.visitExpressionInP(ctx);
+		String type = visit(ctx.getChild(1));
+		return type;
 	}
 
 	@Override
@@ -668,10 +672,12 @@ public class MyVisitor2 extends DECAFBaseVisitor<String>
 		String additionSubsExpression = visit(ctx.getChild(0));
 		String arithmetic = visit(ctx.getChild(1));
 		String multDivExpression = visit(ctx.getChild(2));
+		System.out.println("Left: "+additionSubsExpression);
+		System.out.println("Right: "+multDivExpression);
 		if(additionSubsExpression.equals(multDivExpression)&&
 				((multDivExpression.equals("int"))||(additionSubsExpression.equals("int")))
 				){
-			
+			System.out.println(additionSubsExpression);
 			return additionSubsExpression;
 		}
 		handleSemanticError("Error en la linea: "
