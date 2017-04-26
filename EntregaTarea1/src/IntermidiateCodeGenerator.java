@@ -38,6 +38,11 @@ public class IntermidiateCodeGenerator {
 		return label;
 	}
 	
+	public String newElseLabel(){
+		String label = "ElseLabel_"+trueLabel+"";
+		return label;
+	}
+	
 	public String newFalseLabel(){
 		String label = "Label_False"+falseLabel+"";
 		falseLabel++;

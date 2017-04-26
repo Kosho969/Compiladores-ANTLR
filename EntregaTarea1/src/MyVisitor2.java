@@ -242,18 +242,21 @@ public class MyVisitor2 extends DECAFBaseVisitor<String>
         // Instanciar MethodSymbol
 
 		// Visitar block
+        MethodSymbol currentSymbol = new MethodSymbol(
+    			symbolType,
+    			identifier,
+    			false,
+    			firm
+    		);
+    		//System.out.println(currentSymbol.getFirm());
+    		currentEnvironment.putSymbol("method", identifier, currentSymbol);
 		String result = visit(ctx.block());
+		
 
 		currentEnvironment = environmentsStack.pop();
-		
-		MethodSymbol currentSymbol = new MethodSymbol(
-			symbolType,
-			identifier,
-			false,
-			firm
-		);
-		//System.out.println(currentSymbol.getFirm());
 		currentEnvironment.putSymbol("method", identifier, currentSymbol);
+		
+		
 		
 		return result;
 	}

@@ -42,8 +42,9 @@ public class Environment {
 		// analizar el tipo de variable, asignarle el offset y hacer
 		// el corrimiento de offset actual respectivo
 		if ("variable" == type) {
+			String type2 = s.getType();
 			((VariableSymbol) s).setEntryVariableOffset(
-				this.getAndUpdateCurrentVariableOffsetForType(type)
+				this.getAndUpdateCurrentVariableOffsetForType(type2)
 			);
 		}
 		
@@ -55,7 +56,18 @@ public class Environment {
 		// a sumar en el offset. Si el actual es int, sumar 4. Si el tipo
 		// es array, sumar el tamaño del array, si el tipo es boolean,
 		// sumar uno, etc.
-		int offsetToSum = 4;
+		int offsetToSum = 0;
+		System.out.println("Type TO Offset: "+type);
+		if(type.equals("int")){
+			offsetToSum = 4;
+		}
+		else if (type.equals("char")){
+			offsetToSum = 1;
+		}
+		else if (type.equals("boolean")){
+			offsetToSum = 1;
+		}
+		
 
 		if (this.isClassEnvironment) {
 			int returnValue = this.currentVariablesOffset;
