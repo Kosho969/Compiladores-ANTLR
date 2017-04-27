@@ -994,18 +994,39 @@ public class MyVisitor extends DECAFBaseVisitor<String>
         String multDivExpression = visit(ctx.getChild(0));
         String mdOperator = visit(ctx.getChild(1));
         String percentageExpression = visit(ctx.getChild(2));
-        if(multDivExpression.equals(percentageExpression)&&
-                ((multDivExpression.equals("int"))||(percentageExpression.equals("int")))
-                ){  
-            return multDivExpression;
+        String basicLeft = ctx.getChild(0).getText();
+        String op = ctx.getChild(1).getText();
+        String basicRight = ctx.getChild(2).getText();
+        if(currentTemporarie.equals("")){
+            if (isExpression == true){
+                System.out.println("Operands inside add: "+operandos);
+                System.out.println("left: "+basicLeft);
+                System.out.println("right: "+basicRight);
+                operador = op;
+                String operando1 = operandos.get(0);
+                operandos.remove(operando1);
+                String operando2= operandos.get(0);
+                operandos.remove(operando2);
+                appendToCodigoIntermedio(generator.newTemporary()+operando2+" "+op+" "+operando1);
+                currentTemporarie = "T"+(generator.getTemporarieCount()-1);
+                operador = "";
+            }
         }
-        handleSemanticError("Error en la linea: "
-                + ctx.getStart().getLine()
-                + "\n "
-                + "Expecter type integer"
-            );
-        System.out.println("Error Expected Type Boolean at line: "+ctx.getStart().getLine());
-        return "Error";
+        else{
+            if (isExpression == true){
+                System.out.println("Operands inside add_subs: "+operandos);
+                operador = op;
+                String operando1 = operandos.get(0);
+                operandos.remove(operando1);
+                String operando2= operandos.get(0);
+                operandos.remove(operando2);
+                appendToCodigoIntermedio(generator.newTemporary()+currentTemporarie+" "+op+" "+operando2);
+                currentTemporarie = "T"+(generator.getTemporarieCount()-1);
+                operador = "";
+            }
+        } 
+            return multDivExpression;
+        
     }
 
     @Override
